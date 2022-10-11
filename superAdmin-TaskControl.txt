@@ -1,0 +1,2 @@
+Email: superAdmin@email.com
+Password: Sadmin12345
