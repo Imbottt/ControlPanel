@@ -66,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
 
+
 ### TABLA ESTADO-TAREA ###
 ### TABLA TAREA ###
 ### TABLA TAREA SUBORDINADA ###
