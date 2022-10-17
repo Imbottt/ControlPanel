@@ -1,13 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from rol import views
+from registroEjecucion import views
 
 
 router = DefaultRouter()
-router.register('CRUD-rol',views.RolViewSet, basename='CRUD-rol')
+router.register('CRUD-regExe',views.RolViewSet, basename='CRUD-regExe')
 
-app_name = 'rol'
+app_name = 'registroEjecucion'
 
 urlpatterns = [
     path('', include(router.urls))

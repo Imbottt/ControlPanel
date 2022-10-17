@@ -2,6 +2,7 @@ from email.policy import default
 from lib2to3.pytree import Base
 from random import choices
 from tkinter import CASCADE
+from unittest.util import _MAX_LENGTH
 from xml.etree.ElementInclude import default_loader
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -22,23 +23,19 @@ class UserManager(BaseUserManager):
         return user
 
     ## SUPER USUARIO
-    def create_superuser(self, email, password):
+    def create_superuser(self, email, password, **extra_fields):
         """ Crear super usuario """
-        user = self.create_user(email, password)
+        user = self.create_user(email, password, **extra_fields)
         user.is_staff = True
         user.is_superuser = True
+
         user.save(using=self._db)
 
         return user
 
-### TABLA ROL ###
-class Roll(models.Model):
-    """ Modelo de los roles para los usuarios """
-    rol_name = models.CharField(max_length=25)
-    users = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.rol_name
+###############################################################################
+############################### MODELO DE LA BD ###############################
+###############################################################################
 
 ### TABLA DIRECCIÓN ###
 class Direccion(models.Model):
@@ -48,31 +45,101 @@ class Direccion(models.Model):
     def __str__(self):
         return self.dir_name
 
-### TABLA UNIDAD ###
+### TABLA ROL ###
+class Rol(models.Model):
+    """ Modelo de los roles para los usuarios """
+    rol_name = models.CharField(max_length=30, unique=True)
+
+    def __str__(self):
+        return self.rol_name
 
 ### TABLA USUARIO ###
 class User(AbstractBaseUser, PermissionsMixin):
     """ Modelo personalizado de Usuario que soporta hacer login con email en vez de usuario """
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    rol = models.ForeignKey(Roll, blank=True, null=True, on_delete=models.CASCADE)
-    dir_user = models.ForeignKey(Direccion, blank=True, null=True, on_delete=models.CASCADE)
+    #is_administrador = models.BooleanField(default=False)
+    #is_disenador = models.BooleanField(default=False)
+    #is_funcionario = models.BooleanField(default=False)
+
+    ## Llaves foráneas
+    rol_id = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
+    dir_id = models.ForeignKey(Direccion, null=True, blank=True, on_delete= models.CASCADE)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
 
 
+### TABLA UNIDAD ###
+class Unidad(models.Model):
+    """ Modelo para las unidades """
+    unidad_name = models.CharField(max_length=255)
 
-### TABLA ESTADO-TAREA ###
+    def __str__(self):
+        return self.unidad_name
+
 ### TABLA TAREA ###
-### TABLA TAREA SUBORDINADA ###
-### TABLA FLUJO ###
-### TABLA DETALLE-FLUJO ###
-### TABLA REGISTRO-EJECUCIÓN ###
+class Tarea(models.Model):
+    """ Modelo de las tareas """
+    titulo_tarea = models.CharField(max_length=30, unique=True)
+    descripcion_tarea = models.CharField(max_length=255)
+    fecha_creacion = models.DateField(null=True)
+    fecha_limite = models.DateField(null=True)
+    progreso_tarea = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.titulo_tarea
+
+### TABLA TAREA SUBORDINADA ###
+class TareaSubordinada(models.Model):
+    """ Modelo para las tareas subordinadas """
+    titulo_tarea_sub = models.CharField(max_length=30, unique=True)
+    descripcion_tarea_sub = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.titulo_tarea_sub
+
+### TABLA ESTADO TAREA ###
+class EstadoTarea(models.Model):
+    """ Modelo para los estados de la tarea """
+    estado_name = models.CharField(max_length=30, unique=True)
+    descripcion_estado = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.estado_name
+
+### TABLA FLUJO ###
+class Flujo(models.Model):
+    """ Modelo para los flujos """
+    titulo_flujo = models.CharField(max_length=30, unique=True)
+
+    def __str__(self):
+        return self.titulo_flujo
+
+### TABLA DETALLE-FLUJO ###
+class DetalleFlujo(models.Model):
+    """ Modelo para el detalle de flujo """
+    descripcion_flujo = models.CharField(max_length=255)
+    fecha_creacion = models.DateField(null=True)
+    fecha_fin = models.DateField(null=True)
+
+    def __str__(self):
+        return self.descripcion_flujo
+
+### TABLA REGISTRO-EJECUCIÓN ###
+class RegistroEjecucion(models.Model):
+    """ Modelo para el registro de ejecución """
+    confirmacion = models.BooleanField(null=True)
+    justificacion = models.CharField(max_length=255)
+    observacion = models.CharField(max_length=255)
+    fecha_registro = models.DateField(null=True)
+
+    def __str__(self):
+        return self.confirmacion
 
 
