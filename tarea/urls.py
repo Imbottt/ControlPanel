@@ -1,13 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from rol import views
+from tarea import views
 
 
 router = DefaultRouter()
-router.register('CRUD-rol',views.RolViewSet, basename='CRUD-rol')
+router.register('CRUD-tarea',views.TareaViewSet, basename='CRUD-tarea')
 
-app_name = 'rol'
+app_name = 'tarea'
 
 urlpatterns = [
     path('', include(router.urls))

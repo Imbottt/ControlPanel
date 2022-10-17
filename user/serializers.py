@@ -3,16 +3,18 @@ from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from core.models import User
+from core.models import User,Rol
+from rol.serializers import RolSerializer
 
 ### SERIALIZADORES ###
 
 ### USUARIO ###
 class UserSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto de usuarios """
+
     class Meta:
         model = get_user_model()
-        fields = ('email','password','name','dir_user')
+        fields = ('email','password','name','last_name','rol_id','dir_id')
         extra_kwargs = {
             'password':{
                 'write_only': True, 'min_length':5
@@ -22,7 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """ Crear nuevo usuario con clave encriptada y retornarlo """
         return get_user_model().objects.create_user(**validated_data)
-
 
     def update(self, instance, validated_data):
         """ Actualiza al usuario, configura el password correctamente y lo retorna """
@@ -34,7 +35,24 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
-###  ###
+
+
+### SUPERUSUARIO ###
+class SuperUserSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto de superusuarios """
+    class Meta:
+        model = get_user_model()
+        fields = ('email','password','is_administrador')
+        extra_kwargs = {
+            'password':{
+                'write_only': True, 'min_length':5
+                }
+            }
+    
+    def create(self, validated_data):
+        """ Crear nuevo usuario con clave encriptada y retornarlo """
+        return get_user_model().objects.create_superuser(**validated_data)
+
 
 ### TOKEN DE AUTENTICACIÓN ###
 class AuthTokenSerializer(serializers.Serializer):
@@ -63,8 +81,44 @@ class AuthTokenSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
+class RolSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto Rol """
+    class Meta:
+        model = Rol
+        fields = ('rol_name')
+        read_only_Fields = ('rol_name',)
+
 #### USER TOKEN ####
 class UserTokenSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('email','rol')
+        fields = ('email','name','last_name','rol_id','dir_id')
+
+
+################################
+####### CRUD DEL USUARIO #######
+################################
+
+
+#### SERIALIZADOR QUE MUESTRA USUARIOS == list() ####
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = get_user_model()
+
+    def to_representation(self, instance):
+        return {
+            'id': instance['id'],
+            'email': instance['email'],
+            'name': instance['name'],
+            'last_name': instance['last_name'],
+            'rol_id': instance['rol_id'],
+            'dir_id': instance['dir_id']
+        }
+
+### SERIALIZADOR QUE ACTUALIZA USUARIO ###
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('email','name','last_name','rol_id','dir_id')

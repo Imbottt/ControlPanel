@@ -21,4 +21,8 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/rol/', include('rol.urls')),
     path('api/dir/', include('direccion.urls')),
+    path('api/unidad/', include('unidad.urls')),
+    path('api/tarea/', include('tarea.urls')),
+    path('api/subTarea/', include('subTarea.urls')),
+    path('api/registroEjecucion/', include('registroEjecucion.urls')),
 ]
