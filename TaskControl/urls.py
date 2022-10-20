@@ -24,5 +24,7 @@ urlpatterns = [
     path('api/unidad/', include('unidad.urls')),
     path('api/tarea/', include('tarea.urls')),
     path('api/subTarea/', include('subTarea.urls')),
+    path('api/flujo/', include('flujo.urls')),
+    path('api/estadoTarea/', include('estadoTarea.urls')),
     path('api/registroEjecucion/', include('registroEjecucion.urls')),
 ]
