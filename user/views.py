@@ -127,7 +127,7 @@ class UserViewSet(viewsets.GenericViewSet):
         if self.queryset is None:
             self.queryset = self.model.objects\
                             .filter(is_active=True)\
-                            .values('id','email','name','last_name','rol_id','is_active')
+                            .values('id','email','name','last_name','rol_id','dir_id','is_active')
             return self.queryset
 
 

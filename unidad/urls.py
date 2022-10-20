@@ -1,14 +1,10 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
 from unidad import views
-
-
-router = DefaultRouter()
-router.register('CRUD-unidad',views.UnidadViewSet, basename='CRUD-unidad')
 
 app_name = 'unidad'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('crud-unidad/', views.UnidadCreateListApiView.as_view(), name='ListCreateUnidad'),
+    path('crud-unidad/<int:pk>/', views.UnidadRetrieveUpdateDestroyApiView.as_view(), name='RetrieveUpdateDestroyUnidad'),
 ]

@@ -45,10 +45,21 @@ class Direccion(models.Model):
     def __str__(self):
         return self.dir_name
 
+### TABLA UNIDAD ###
+class Unidad(models.Model):
+    """ Modelo para las unidades """
+    unidad_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.unidad_name
+
 ### TABLA ROL ###
 class Rol(models.Model):
     """ Modelo de los roles para los usuarios """
     rol_name = models.CharField(max_length=30, unique=True)
+
+    # Llaves foráneas
+    unidad_id = models.ForeignKey(Unidad, null=True, blank=True, on_delete= models.CASCADE)
 
     def __str__(self):
         return self.rol_name
@@ -62,10 +73,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    #is_administrador = models.BooleanField(default=False)
-    #is_disenador = models.BooleanField(default=False)
-    #is_funcionario = models.BooleanField(default=False)
-
     ## Llaves foráneas
     rol_id = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
     dir_id = models.ForeignKey(Direccion, null=True, blank=True, on_delete= models.CASCADE)
@@ -74,14 +81,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
-
-### TABLA UNIDAD ###
-class Unidad(models.Model):
-    """ Modelo para las unidades """
-    unidad_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.unidad_name
+###############################################################################
+###############################################################################
+###############################################################################
 
 ### TABLA TAREA ###
 class Tarea(models.Model):

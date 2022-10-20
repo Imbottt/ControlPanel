@@ -1,92 +1,75 @@
-from ast import Delete, Not
-from asyncio.windows_events import NULL
-from importlib.util import resolve_name
-from rest_framework import viewsets, mixins
+###
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-from django.shortcuts import get_object_or_404
-
+### Modelo de la BD ###
 from core.models import Rol
-
-from rol.serializers import RolSerializer, RolListSerializer, UpdateRolSerializer
-
-###
+### Serializadores ###
+from rol.serializers import RolSerializer
+### 
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 ###
-
 
 ##############
 ## CRUD ROL ##
 ##############
 
-class RolViewSet(viewsets.GenericViewSet):
-    model = Rol
+####################################################################################
+
+class RolCreateListApiView(generics.ListCreateAPIView):
+    """ Una vista que crea y lista los roles que existen en la BD """
     serializer_class = RolSerializer
-    list_serializer_class = RolListSerializer
-    queryset = None
+    queryset = RolSerializer.Meta.model.objects.all()
 
-    def get_object(self, pk):
-        try:
-            return self.model.objects.get(pk=pk)
-        except self.model.DoesNotExist:
-            return Response ({'message':'No existe'}, status = status.HTTP_400_BAD_REQUEST)
-        
+    # Función para crear nuevos roles
+    def post(self, request):
+        serializer = self.serializer_class(data = request.data)
 
-    # CONSULTA PARA OBTENER TODOS LOS ROLES DE LA BD #
-    def get_queryset(self):
-        if self.queryset is None:
-            self.queryset = self.model.objects.values('id','rol_name')
-            return self.queryset
-
-    # LISTA LOS ROLES EXISTENTES EN LA BD #
-    def list(self,request):
-        rols = self.get_queryset()
-        rols_serializer = self.list_serializer_class(rols, many=True)
-        return Response(rols_serializer.data, status=status.HTTP_200_OK)
-
-    # CREA NUEVOS ROLES #
-    def create(self, request):
-        rol_serializer = self.serializer_class(data=request.data)
-        if rol_serializer.is_valid():
-            rol_serializer.save()
+        if serializer.is_valid():
+            serializer.save()
             return Response({
                 'message':'Rol creado correctamente'
             }, status = status.HTTP_201_CREATED)
-        return Response({
-            'message':'Hay errores en el momento de crear un rol',
-            'errors':rol_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
 
-    # RETORNA LA INFORMACIÓN DE UN ROL ESPECIFICO #
-    def retrieve(self, request, pk=None):
-        rol = self.get_object(pk)
-        rol_serializer = self.serializer_class(rol)
-        return Response(rol_serializer.data)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    # ACTUALIZA A LOS ROL # 
-    def update(self, request, pk=None):
-        rol = self.get_object(pk)
-        rol_serializer = UpdateRolSerializer(rol, data = request.data)
-        if rol_serializer.is_valid():
-            rol_serializer.save()
-            return Response({
-                'message':'Rol actualizado correctamente'
-            },status = status.HTTP_200_OK)
+####################################################################################
 
-        return Response({
-            'message':'Hay errores en la actualizaciones',
-            'errors':rol_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
+class RolRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
+    """ Una vista que busca, actualiza y destruye los roles que existen en la BD """
+    serializer_class = RolSerializer
 
-    # ELIMINA A LOS ROL #
-    def destroy(self, request, pk=None):
-        rol = self.get_object(pk)
-        if rol == self.get_object(pk):
-            return Response({
-                'message':'Rol eliminado correctamente'
-            },status = status.HTTP_200_OK)
-        return Response({
-            'message':'No existe el rol que desea eliminar'
-        },status = status.HTTP_404_NOT_FOUND)
+    # Consulta para traer todos los roles que existen en la BD
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return self.get_serializer().Meta.model.objects.all()
+        else:
+            return self.get_serializer().Meta.model.objects.filter(id=pk).first()
+
+    # Obtiene un rol en específico
+    def patch(self, request, pk=None):
+        if self.get_queryset(pk):
+            rol_serializer = self.serializer_class(self.get_queryset(pk))
+            return Response(rol_serializer.data, status = status.HTTP_200_OK)
+        return Response({'error':'No existe ese rol'}, status = status.HTTP_400_BAD_REQUEST)
+    
+    # Actualiza un rol en específico
+    def put(self, request, pk=None):
+        if self.get_queryset(pk):
+            rol_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
+            if rol_serializer.is_valid():
+                rol_serializer.save()
+                return Response(rol_serializer.data, status = status.HTTP_200_OK)
+            return Response(rol_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+    # Elimina un rol en específico
+    def delete(self, request, pk=None):
+        rol_destroy = self.get_queryset().filter(id = pk).first()
+
+        if rol_destroy:
+            rol_destroy.delete()
+            return Response({'message':'Rol eliminado correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No existe ese rol'}, status = status.HTTP_400_BAD_REQUEST)
+        
+
+

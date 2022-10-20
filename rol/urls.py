@@ -1,14 +1,10 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
 from rol import views
-
-
-router = DefaultRouter()
-router.register('CRUD-rol',views.RolViewSet, basename='CRUD-rol')
 
 app_name = 'rol'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('crud-rol/', views.RolCreateListApiView.as_view(), name='ListCreateRol'),
+    path('crud-rol/<int:pk>/', views.RolRetrieveUpdateDestroyApiView.as_view(), name='RetrieveUpdateDestroyRol')
 ]
