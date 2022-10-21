@@ -1,14 +1,10 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
 from tarea import views
-
-
-router = DefaultRouter()
-router.register('CRUD-tarea',views.TareaViewSet, basename='CRUD-tarea')
 
 app_name = 'tarea'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('crud-tarea/', views.TareaCreateListApiView.as_view(), name='ListCreateTarea'),
+    path('crud-tarea/<int:pk>/', views.TareaRetrieveUpdateDestroyApiView.as_view(), name='RetrieveUpdateDestroyTarea')
 ]

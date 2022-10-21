@@ -1,87 +1,75 @@
-from importlib.util import resolve_name
-from rest_framework import viewsets, mixins
+###
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
-from django.shortcuts import get_object_or_404
-
+### Modelo de la BD ###
 from core.models import TareaSubordinada
-
-from subTarea.serializers import SubTareaSerializer, SubTareaListSerializer, UpdateSubTareaSerializer
-
-###
+### Serializadores ###
+from subTarea.serializers import SubTareaSerializer
+### 
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 ###
-
 
 ############################
 ## CRUD TAREA SUBORDINADA ##
 ############################
 
-class SubTareaViewSet(viewsets.GenericViewSet):
-    model = TareaSubordinada
+####################################################################################
+
+class SubTareaCreateListApiView(generics.ListCreateAPIView):
+    """ Una vista que crea y lista las tareas subordinada que existen en la BD """
     serializer_class = SubTareaSerializer
-    list_serializer_class = SubTareaListSerializer
-    queryset = None
+    queryset = SubTareaSerializer.Meta.model.objects.all()
 
-    def get_object(self, pk):
-        return get_object_or_404(self.model, pk=pk)
-        
+    # Función para crear nuevas tareas subordinadas
+    def post(self, request):
+        serializer = self.serializer_class(data = request.data)
 
-    # CONSULTA PARA OBTENER TODAS LAS TAREAS SUBORDINADAS DE LA BD #
-    def get_queryset(self):
-        if self.queryset is None:
-            self.queryset = self.model.objects.values('id','titulo_tarea_sub','descripcion_tarea_sub')
-            return self.queryset
-
-    # LISTA LAS TAREAS SUBORDINADAS EXISTENTES EN LA BD #
-    def list(self,request):
-        subtareas = self.get_queryset()
-        subtareas_serializer = self.list_serializer_class(subtareas, many=True)
-        return Response(subtareas_serializer.data, status=status.HTTP_200_OK)
-
-    # CREA NUEVAS TAREAS SUBORDINADAS #
-    def create(self, request):
-        subtarea_serializer = self.serializer_class(data=request.data)
-        if subtarea_serializer.is_valid():
-            subtarea_serializer.save()
+        if serializer.is_valid():
+            serializer.save()
             return Response({
                 'message':'Tarea subordinada creada correctamente'
             }, status = status.HTTP_201_CREATED)
-        return Response({
-            'message':'Hay errores en el momento de crear la tarea subordinada',
-            'errors':subtarea_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
 
-    # RETORNA LA INFORMACIÓN DE UNA TAREA SUBORDINADA ESPECÍFICA #
-    def retrieve(self, request, pk=None):
-        subtarea = self.get_object(pk)
-        subtarea_serializer = self.serializer_class(subtarea)
-        return Response(subtarea_serializer.data)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    # ACTUALIZA A LAS TAREAS SUBORDINADAS # 
-    def update(self, request, pk=None):
-        subtarea = self.get_object(pk)
-        subtarea_serializer = UpdateSubTareaSerializer(subtarea, data = request.data)
-        if subtarea_serializer.is_valid():
-            subtarea_serializer.save()
-            return Response({
-                'message':'Tarea subordinada actualizada correctamente'
-            },status = status.HTTP_200_OK)
+####################################################################################
 
-        return Response({
-            'message':'Hay errores en la actualización de la tarea subordinada',
-            'errors':subtarea_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
+class SubTareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
+    """ Una vista que busca, actualiza y destruye las tareas subordinadas que existen en la BD """
+    serializer_class = SubTareaSerializer
 
-    # ELIMINA LAS TAREAS SUBORDINADAS #
-    def destroy(self, request, pk=None):
-        subtarea_destroy = self.model.objects.filter(id=pk).update('titulo_tarea_sub')
-        if subtarea_destroy == 1:
-            return Response({
-                'message':'Tarea subordinada eliminada correctamente'
-            },status = status.HTTP_200_OK)
-        return Response({
-            'message':'No existe la tarea subordinada que desea eliminar'
-        },status = status.HTTP_404_NOT_FOUND)
+    # Consulta para traer todas las tareas subordinadas que existen en la BD
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return self.get_serializer().Meta.model.objects.all()
+        else:
+            return self.get_serializer().Meta.model.objects.filter(id=pk).first()
+
+    # Obtiene una tarea subordinada en específico
+    def patch(self, request, pk=None):
+        if self.get_queryset(pk):
+            subtarea_serializer = self.serializer_class(self.get_queryset(pk))
+            return Response(subtarea_serializer.data, status = status.HTTP_200_OK)
+        return Response({'error':'No existe esa tarea subordinada'}, status = status.HTTP_400_BAD_REQUEST)
+    
+    # Actualiza una tarea subordinada en específico
+    def put(self, request, pk=None):
+        if self.get_queryset(pk):
+            subtarea_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
+            if subtarea_serializer.is_valid():
+                subtarea_serializer.save()
+                return Response(subtarea_serializer.data, status = status.HTTP_200_OK)
+            return Response(subtarea_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+    # Elimina una tarea subordinada en específico
+    def delete(self, request, pk=None):
+        subtarea_destroy = self.get_queryset().filter(id = pk).first()
+
+        if subtarea_destroy:
+            subtarea_destroy.delete()
+            return Response({'message':'Tarea subordinada eliminada correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No existe esa tarea subordinada'}, status = status.HTTP_400_BAD_REQUEST)
+        
+
+

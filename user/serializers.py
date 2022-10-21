@@ -81,13 +81,6 @@ class AuthTokenSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
-class RolSerializer(serializers.ModelSerializer):
-    """ Serializador para el objeto Rol """
-    class Meta:
-        model = Rol
-        fields = ('rol_name')
-        read_only_Fields = ('rol_name',)
-
 #### USER TOKEN ####
 class UserTokenSerializer(serializers.ModelSerializer):
 
