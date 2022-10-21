@@ -64,6 +64,11 @@ class Rol(models.Model):
     def __str__(self):
         return self.rol_name
 
+### TABLA CARGO ### ---> Funciona como una tabla que alberga sub-roles
+class Cargo(models.Model):
+    """ Modelo de los cargos para los usuarios """
+    cargo_name = models.CharField(max_length=255, unique=True)
+
 ### TABLA USUARIO ###
 class User(AbstractBaseUser, PermissionsMixin):
     """ Modelo personalizado de Usuario que soporta hacer login con email en vez de usuario """
@@ -76,6 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ## Llaves foráneas
     rol_id = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
     dir_id = models.ForeignKey(Direccion, null=True, blank=True, on_delete= models.CASCADE)
+    cargo_id = models.ForeignKey(Cargo, null=True, blank=True, on_delete=models.CASCADE)
 
     objects = UserManager()
 
@@ -84,36 +90,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 ###############################################################################
 ###############################################################################
 ###############################################################################
-
-### TABLA TAREA ###
-class Tarea(models.Model):
-    """ Modelo de las tareas """
-    titulo_tarea = models.CharField(max_length=30, unique=True)
-    descripcion_tarea = models.CharField(max_length=255)
-    fecha_creacion = models.DateField(null=True)
-    fecha_limite = models.DateField(null=True)
-    progreso_tarea = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.titulo_tarea
-
-### TABLA TAREA SUBORDINADA ###
-class TareaSubordinada(models.Model):
-    """ Modelo para las tareas subordinadas """
-    titulo_tarea_sub = models.CharField(max_length=30, unique=True)
-    descripcion_tarea_sub = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.titulo_tarea_sub
-
-### TABLA ESTADO TAREA ###
-class EstadoTarea(models.Model):
-    """ Modelo para los estados de la tarea """
-    estado_name = models.CharField(max_length=30, unique=True)
-    descripcion_estado = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.estado_name
 
 ### TABLA FLUJO ###
 class Flujo(models.Model):
@@ -130,18 +106,67 @@ class DetalleFlujo(models.Model):
     fecha_creacion = models.DateField(null=True)
     fecha_fin = models.DateField(null=True)
 
+    # Llaves foráneas
+    flujo_id = models.ForeignKey(Flujo, null=True, blank=True, on_delete=models.CASCADE)
+
     def __str__(self):
         return self.descripcion_flujo
+
+### TABLA TAREA ###
+class Tarea(models.Model):
+    """ Modelo de las tareas """
+    titulo_tarea = models.CharField(max_length=30, unique=True)
+    descripcion_tarea = models.CharField(max_length=255)
+    fecha_creacion = models.DateField(null=True)
+    fecha_limite = models.DateField(null=True)
+    progreso_tarea = models.CharField(max_length=255)
+
+    detalle_flujo_id = models.ForeignKey(DetalleFlujo, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.titulo_tarea
+
+### TABLA TAREA SUBORDINADA ###
+class TareaSubordinada(models.Model):
+    """ Modelo para las tareas subordinadas """
+    titulo_tarea_sub = models.CharField(max_length=30, unique=True)
+    descripcion_tarea_sub = models.CharField(max_length=255)
+
+    # Llaves foráneas
+    tarea_id = models.ForeignKey(Tarea, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.titulo_tarea_sub
+
+### TABLA ESTADO TAREA ###
+class EstadoTarea(models.Model):
+    """ Modelo para los estados de la tarea """
+    estado_name = models.CharField(max_length=30, unique=True)
+    descripcion_estado = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.estado_name
 
 ### TABLA REGISTRO-EJECUCIÓN ###
 class RegistroEjecucion(models.Model):
     """ Modelo para el registro de ejecución """
+    titulo_registro = models.CharField(max_length=255, unique=True)
     confirmacion = models.BooleanField(null=True)
     justificacion = models.CharField(max_length=255)
     observacion = models.CharField(max_length=255)
     fecha_registro = models.DateField(null=True)
 
+    # Llaves foráneas
+    estado_t_id = models.ForeignKey(EstadoTarea, null=True, blank=True, on_delete=models.CASCADE)
+    tarea_sub_id = models.ForeignKey(TareaSubordinada, null=True, blank=True, on_delete=models.CASCADE)
+    usuario_id = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+
     def __str__(self):
-        return self.confirmacion
+        return self.titulo_registro
+
+
+
+
+
 
 

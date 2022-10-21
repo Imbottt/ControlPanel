@@ -1,14 +1,10 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
 from direccion import views
-
-
-router = DefaultRouter()
-router.register('create-dir',views.DirViewSet)
 
 app_name = 'direccion'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('crud-dir/', views.DirCreateListApiView.as_view(), name='ListCreateDir'),
+    path('crud-dir/<int:pk>/', views.DirRetrieveUpdateDestroyApiView.as_view(), name='RetrieveUpdateDestroyDir')
 ]
