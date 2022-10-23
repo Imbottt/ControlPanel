@@ -57,7 +57,6 @@ class Unidad(models.Model):
 class Rol(models.Model):
     """ Modelo de los roles para los usuarios """
     rol_name = models.CharField(max_length=30, unique=True)
-
     # Llaves foráneas
     unidad_id = models.ForeignKey(Unidad, null=True, blank=True, on_delete= models.CASCADE)
 
