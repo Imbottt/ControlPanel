@@ -58,9 +58,6 @@ class Rol(models.Model):
     """ Modelo de los roles para los usuarios """
     rol_name = models.CharField(max_length=30, unique=True)
 
-    # Llaves foráneas
-    unidad_id = models.ForeignKey(Unidad, null=True, blank=True, on_delete= models.CASCADE)
-
     def __str__(self):
         return self.rol_name
 
@@ -79,9 +76,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     ## Llaves foráneas
-    rol_id = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
-    dir_id = models.ForeignKey(Direccion, null=True, blank=True, on_delete= models.CASCADE)
-    cargo_id = models.ForeignKey(Cargo, null=True, blank=True, on_delete=models.CASCADE)
+    rol = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
+    unidad = models.ForeignKey(Unidad, null=True, blank=True, on_delete= models.CASCADE)
+    cargo = models.ForeignKey(Cargo, null=True, blank=True, on_delete=models.CASCADE)
 
     objects = UserManager()
 
