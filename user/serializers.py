@@ -3,10 +3,36 @@ from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from core.models import User,Rol
+from core.models import User, Rol, Cargo, Unidad
 from rol.serializers import RolSerializer
 
 ### SERIALIZADORES ###
+
+###
+### SERIALIZADOR PARA EL ROL ###
+class RolSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto Rol """
+    class Meta:
+        model = Rol
+        fields = ('id','rol_name')
+        read_only_Fields = ('id',)
+
+### SERIALIZADOR PARA EL CARGO ###
+class CargoSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto Cargo """
+    class Meta:
+        model = Cargo
+        fields = ('id','cargo_name')
+        read_only_Fields = ('id',)
+
+### SERIALIZADOR PARA UNIDAD ###
+class UnidadSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto Unidad """
+    class Meta:
+        model = Unidad
+        fields = ('id','unidad_name','dir')
+        read_only_Fields = ('id',)
+###
 
 ### USUARIO ###
 class UserSerializer(serializers.ModelSerializer):
@@ -14,12 +40,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('email','password','name','last_name','rol_id','dir_id')
+        fields = ('email','password','name','last_name','rol','cargo','unidad')
         extra_kwargs = {
             'password':{
                 'write_only': True, 'min_length':5
                 }
             }
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['rol'] = RolSerializer(instance.rol).data
+        response['cargo'] = CargoSerializer(instance.cargo).data
+        response['unidad'] = UnidadSerializer(instance.unidad).data
+        return response
 
     def create(self, validated_data):
         """ Crear nuevo usuario con clave encriptada y retornarlo """
@@ -42,7 +75,7 @@ class SuperUserSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto de superusuarios """
     class Meta:
         model = get_user_model()
-        fields = ('email','password','is_administrador')
+        fields = ('email','password')
         extra_kwargs = {
             'password':{
                 'write_only': True, 'min_length':5
@@ -86,13 +119,18 @@ class UserTokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email','name','last_name','rol_id','dir_id')
+        fields = ('email','name','last_name','rol','cargo','unidad')
 
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['rol'] = RolSerializer(instance.rol).data
+        response['cargo'] = CargoSerializer(instance.cargo).data
+        response['unidad'] = UnidadSerializer(instance.unidad).data
+        return response
 
 ################################
 ####### CRUD DEL USUARIO #######
 ################################
-
 
 #### SERIALIZADOR QUE MUESTRA USUARIOS == list() ####
 class UserListSerializer(serializers.ModelSerializer):
@@ -106,12 +144,13 @@ class UserListSerializer(serializers.ModelSerializer):
             'email': instance['email'],
             'name': instance['name'],
             'last_name': instance['last_name'],
-            'rol_id': instance['rol_id'],
-            'dir_id': instance['dir_id']
+            'rol': instance['rol'],
+            'cargo': instance['cargo'],
+            'unidad': instance['unidad']
         }
 
 ### SERIALIZADOR QUE ACTUALIZA USUARIO ###
 class UpdateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('email','name','last_name','rol_id','dir_id')
+        fields = ('email','name','last_name','rol','cargo','unidad') 
