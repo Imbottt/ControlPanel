@@ -59,8 +59,8 @@ class EstadoTareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIV
             estado_tarea_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if estado_tarea_serializer.is_valid():
                 estado_tarea_serializer.save()
-                return Response(estado_tarea_serializer.data, status = status.HTTP_200_OK)
-            return Response(estado_tarea_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Estado de tarea actualizado correctamente'}, status = status.HTTP_200_OK)
+            return Response({'error':'No existe ese estado de tarea'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un estado de tarea en específico
     def delete(self, request, pk=None):

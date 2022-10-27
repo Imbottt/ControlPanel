@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from core.models import UserTarea, Tarea, Rol, Cargo, Unidad, Direccion, RegistroEjecucion, EstadoTarea
+from core.models import UserTarea, Tarea, Rol, Cargo, Unidad, Direccion, EstadoTarea
 from django.contrib.auth import get_user_model # --> User --> Modelo User de la BD
+
 
 ### SERIALIZADOR PARA EL ROL ###
 class RolSerializer(serializers.ModelSerializer):
@@ -50,21 +51,6 @@ class UserSerializer(serializers.ModelSerializer):
         response['unidad'] = UnidadSerializer(instance.unidad).data
         return response
 
-### SERIALIZADOR PARA USER-TAREA###
-class UserTareaSerializer(serializers.ModelSerializer):
-    """ Serializador para el objeto Rol """
-    class Meta:
-        model = UserTarea
-        fields = ['id','user','tarea']
-        read_only_Fields = ('id',)
-
-    def to_representation(self, instance):
-        return {
-            'id': instance['id'],
-            'user': instance['user'],
-            'tarea': instance['tarea'],
-        }
-
 ### SERIALIZADOR ESTADO TAREA###
 class EstadoTareaSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Estado-Tarea """
@@ -85,15 +71,18 @@ class TareaSerializer(serializers.ModelSerializer):
         response['estado'] = EstadoTareaSerializer(instance.estado).data
         return response
 
-### SERIALIZADOR REGISTRO EJECUCIÓN ###
-class RegistroExeSerializer(serializers.ModelSerializer):
-    """ Serializador para el objeto Registro de ejecución """
+### SERIALIZADOR PARA USER-TAREA###
+class UserTareaSerializer(serializers.ModelSerializer):
+    """ Serializador para el objeto Rol """
     class Meta:
-        model = RegistroEjecucion
-        fields = ['id','titulo_reg','fecha_reg','userTarea']
+        model = UserTarea
+        fields = ['id','user','tarea']
         read_only_Fields = ('id',)
 
     def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['userTarea'] = UserTareaSerializer(instance.userTarea).data
-        return response
+        return {
+            'id': instance['id'],
+            'user': instance['user'],
+            'tarea': instance['tarea'],
+        }
+

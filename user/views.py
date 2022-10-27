@@ -8,15 +8,22 @@ from user.serializers import (
     SuperUserSerializer, 
     UserSerializer, 
     AuthTokenSerializer, 
-    UserTokenSerializer, 
-    UserListSerializer,
-    UpdateUserSerializer)
+    UserTokenSerializer)
 from rest_framework import generics, authentication, permissions, status
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.settings import api_settings
 from rest_framework import viewsets
+
+### Modelo de la BD ###
+from core.models import User
+### Serializadores ###
+from user.serializers import UserSerializer
+### 
+from rest_framework.response import Response
+from rest_framework import status, generics
+###
 
 from django.shortcuts import get_object_or_404
 
@@ -27,18 +34,20 @@ from core.models import User
 
 ### VISTAS ###
 
-    # PERMISOS
-    #authentication_classes = (authentication.TokenAuthentication,)
-    #permission_classes = (permissions.IsAuthenticated,)
-
 # Super Usuario
 class CreateSuperUserView(generics.CreateAPIView):
     """ Crear un Super usuario == Administrador """
+    # PERMISOS
+    #authentication_classes = (authentication.TokenAuthentication,)
+    #permission_classes = (permissions.IsAuthenticated,)
     serializer_class = SuperUserSerializer
 
 
 ### LOGIN ###
 class Login(ObtainAuthToken):
+    # PERMISOS
+    #authentication_classes = (authentication.TokenAuthentication,)
+    #permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         login_serializer = self.serializer_class(data = request.data, context = {'request':request})
@@ -80,6 +89,10 @@ class Login(ObtainAuthToken):
 #### LOGOUT ####
 class Logout(APIView):
     """ Salir de la aplicación """
+    # PERMISOS
+    #authentication_classes = (authentication.TokenAuthentication,)
+    #permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request, *args, **kwargs):
         try:
             token = request.GET.get('token')
@@ -111,75 +124,72 @@ class Logout(APIView):
             return Response({'error':'No se ha encontrado token en la petición'},
                                     status = status.HTTP_409_CONFLICT)
 
-#### CREAR USUARIO ####
-class UserViewSet(viewsets.GenericViewSet):
-    model = User
+###############
+## CRUD USER ##
+###############
+
+####################################################################################
+
+class UserCreateListApiView(generics.ListCreateAPIView):
+    # PERMISOS
+    #authentication_classes = (authentication.TokenAuthentication,)
+    #permission_classes = (permissions.IsAuthenticated,)
+    """ Una vista que crea y lista los usuarios que existen en la BD """
     serializer_class = UserSerializer
-    list_serializer_class = UserListSerializer
-    queryset = None
+    queryset = UserSerializer.Meta.model.objects.all()
 
-    def get_object(self, pk):
-        return get_object_or_404(self.model, pk=pk)
+    # Función para crear nuevos usuarios
+    def post(self, request):
+        serializer = self.serializer_class(data = request.data)
 
-    
-    # CONSULTA PARA OBTENER TODOS LOS USUARIOS DE LA BD #
-    def get_queryset(self):
-        if self.queryset is None:
-            self.queryset = self.model.objects\
-                            .filter(is_active=True)\
-                            .values('id','email','name','last_name','rol_id','dir_id','is_active')
-            return self.queryset
-
-
-    # LISTA LOS USUARIOS CON SUS ATRIBUTOS #
-    def list(self,request):
-        users = self.get_queryset()
-        users_serializer = self.list_serializer_class(users, many=True)
-        return Response(users_serializer.data, status=status.HTTP_200_OK)
-
-
-    # CREA NUEVOS USUARIOS #
-    def create(self, request):
-        user_serializer = self.serializer_class(data=request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
+        if serializer.is_valid():
+            serializer.save()
             return Response({
                 'message':'Usuario creado correctamente'
             }, status = status.HTTP_201_CREATED)
-        return Response({
-            'message':'Hay errores en el registro',
-            'errors':user_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
 
-    # RETORNA LA INFORMACIÓN DE UN USUARIO ESPECIFICO #
-    def retrieve(self, request, pk=None):
-        user = self.get_object(pk)
-        user_serializer = self.serializer_class(user)
-        return Response(user_serializer.data)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    # ACTUALIZA A LOS USUARIOS # 
-    def update(self, request, pk=None):
-        user = self.get_object(pk)
-        user_serializer = UpdateUserSerializer(user, data = request.data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return Response({
-                'message':'Usuario actualizado correctamente'
-            },status = status.HTTP_200_OK)
+####################################################################################
 
-        return Response({
-            'message':'Hay errores en la actualizaciones',
-            'errors':user_serializer.errors
-        },status = status.HTTP_400_BAD_REQUEST)
+class UserRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
+    # PERMISOS
+    #authentication_classes = (authentication.TokenAuthentication,)
+    #permission_classes = (permissions.IsAuthenticated,)
+    """ Una vista que busca, actualiza y destruye los usuarios que existen en la BD """
+    serializer_class = UserSerializer
 
-    # ELIMINA A LOS USUARIOS #
-    def destroy(self, request, pk=None):
-        user_destroy = self.model.objects.filter(id=pk).update(is_active=False)
-        if user_destroy == 1:
-            return Response({
-                'message':'Usuario eliminado correctamente'
-            },status = status.HTTP_200_OK)
-        return Response({
-            'message':'No existe el usuario que desea eliminar'
-        },status = status.HTTP_404_NOT_FOUND)
+    # Consulta para traer todos los usuarios que existen en la BD
+    def get_queryset(self, pk=None):
+        if pk is None:
+            return self.get_serializer().Meta.model.objects.all()
+        else:
+            return self.get_serializer().Meta.model.objects.filter(id=pk).first()
+
+    # Obtiene un usuario en específico
+    def patch(self, request, pk=None):
+        if self.get_queryset(pk):
+            user_serializer = self.serializer_class(self.get_queryset(pk))
+            return Response(user_serializer.data, status = status.HTTP_200_OK)
+        return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
+    
+    # Actualiza un usuario en específico
+    def put(self, request, pk=None):
+        if self.get_queryset(pk):
+            user_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
+            if user_serializer.is_valid():
+                user_serializer.save()
+                return Response({'message':'Usuario actualizado correctamente'}, status = status.HTTP_200_OK)
+            return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
+
+    # Elimina un usuario en específico
+    def delete(self, request, pk=None):
+        destroy = self.get_queryset().filter(id = pk).first()
+
+        if destroy:
+            destroy.delete()
+            return Response({'message':'Usuario eliminado correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
+
+
 

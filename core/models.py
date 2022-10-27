@@ -1,6 +1,8 @@
+from datetime import datetime
 from email.policy import default
 from lib2to3.pytree import Base
 from random import choices
+from secrets import choice
 from tkinter import CASCADE
 from unittest.util import _MAX_LENGTH
 from xml.etree.ElementInclude import default_loader
@@ -81,6 +83,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    creador = models.IntegerField(default=0)
+
     ## Claves foráneas
     rol = models.ForeignKey(Rol, null=True, on_delete=models.CASCADE)
     cargo = models.ForeignKey(Cargo, null=True, on_delete=models.CASCADE)
@@ -103,6 +107,9 @@ class Flujo(models.Model):
     fecha_inicio = models.DateField(null=True)
     fecha_fin = models.DateField(null=True)
 
+    # Clave foránea
+    user = models.ForeignKey(User, null=True, on_delete=models.DO_NOTHING)
+
     def __str__(self):
         return self.flujo_name
 
@@ -120,11 +127,10 @@ class Tarea(models.Model):
     """ Tabla de las tareas """
     titulo_tarea = models.CharField(max_length=50, unique=True)
     descripcion_tarea = models.CharField(max_length=255)
-    fecha_creacion = models.DateField(null=True)
+    fecha_creacion = datetime.now()
     fecha_inicio = models.DateField(null=True)
     fecha_limite = models.DateField(null=True)
     progreso_tarea = models.CharField(max_length=255)
-
     # Claves foráneas
     estado = models.ForeignKey(EstadoTarea, null=True, on_delete=models.DO_NOTHING)
 
@@ -143,17 +149,22 @@ class UserTarea(models.Model):
         return self.asignacion
 
 ### TABLA ALERTA ###
-class Alerta(models.Model):
+alerta_choices = (
+    ("0", "--------"), 
+    ("1", "Acepto"), 
+    ("2", "Rechazo"), 
+) 
+
+class Alertas(models.Model):
     """ Tabla de Alertas """
-    alerta_name = models.CharField(max_length=50, unique=True)
-    confirmacion = models.CharField(max_length=255)
+    confirmacion = models.CharField(max_length=10, choices=alerta_choices, default=0)
     justificacion = models.CharField(max_length=255)
 
     # Claves foráneas
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.alerta_name
+        return self.id, self.confirmacion
 
 ### TABLA TAREA SUBORDINADA ###
 class TareaSubordinada(models.Model):

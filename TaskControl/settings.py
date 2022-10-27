@@ -43,14 +43,15 @@ INSTALLED_APPS = [
     'user',
     'rol',
     'direccion',
-    
-    'detalleFlujo',
     'estadoTarea',
     'flujo',
     'registroEjecucion',
     'subTarea',
     'tarea',
     'unidad',
+    'alerta',
+    'cargo',
+    'userTarea',
 
     ## REST FRAMEWORK ##
     'rest_framework',

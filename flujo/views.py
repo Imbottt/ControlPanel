@@ -59,8 +59,8 @@ class FlujoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             flujo_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if flujo_serializer.is_valid():
                 flujo_serializer.save()
-                return Response(flujo_serializer.data, status = status.HTTP_200_OK)
-            return Response(flujo_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'flujo actualizado correctamente'}, status = status.HTTP_200_OK)
+            return Response({'error':'No existe ese flujo'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un flujo en específico
     def delete(self, request, pk=None):

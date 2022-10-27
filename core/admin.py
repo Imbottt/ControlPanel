@@ -28,12 +28,12 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(models.User, UserAdmin) # -Tabla Usuario
 admin.site.register(models.Rol) # Tabla Rol
 admin.site.register(models.Direccion) # Tabla Dirección
-
 admin.site.register(models.Unidad) # Tabla Unidad
-admin.site.register(models.DetalleFlujo) # Tabla Detalle Flujo
+admin.site.register(models.UserTarea) # Tabla User - Tarea
 admin.site.register(models.EstadoTarea) # Tabla Estado de Tarea
 admin.site.register(models.Flujo) # Tabla Flujo
 admin.site.register(models.Tarea) # Tabla Tarea
 admin.site.register(models.TareaSubordinada) # Tabla Tarea Subordinada
-
 admin.site.register(models.RegistroEjecucion) # Tabla Dirección
+admin.site.register(models.Cargo) # Tabla Cargo
+admin.site.register(models.Alertas) # Tabla Alerta
