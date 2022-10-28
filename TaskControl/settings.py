@@ -147,3 +147,6 @@ REST_FRAMEWORK = {
     'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S'
 
 }
+
+## CORS
+CORS_ORIGIN_ALLOW_ALL = True
