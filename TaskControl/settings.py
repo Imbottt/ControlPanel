@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'user',
     'rol',
     'direccion',
-    'estadoTarea',
     'flujo',
     'registroEjecucion',
     'subTarea',
@@ -142,3 +141,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'core.User' # Dentro del app core llamamos al modelo User
+
+REST_FRAMEWORK = {
+
+    'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S'
+
+}

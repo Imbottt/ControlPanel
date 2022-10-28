@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import UserTarea, Tarea, Rol, Cargo, Unidad, Direccion, EstadoTarea
+from core.models import UserTarea, Tarea, Rol, Cargo, Unidad, Direccion
 from django.contrib.auth import get_user_model # --> User --> Modelo User de la BD
 
 
@@ -51,25 +51,13 @@ class UserSerializer(serializers.ModelSerializer):
         response['unidad'] = UnidadSerializer(instance.unidad).data
         return response
 
-### SERIALIZADOR ESTADO TAREA###
-class EstadoTareaSerializer(serializers.ModelSerializer):
-    """ Serializador para el objeto Estado-Tarea """
-    class Meta:
-        model = EstadoTarea
-        fields = ['estado_name']
-
 ### SERIALIZADOR ###
 class TareaSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Tarea """
     class Meta:
         model = Tarea
-        fields = ('id','titulo_tarea','descripcion_tarea','fecha_creacion','fecha_limite','progreso_tarea','estado')
+        fields = ('id','titulo_tarea','descripcion_tarea','fecha_creacion','fecha_inicio','fecha_limite','progreso_tarea','estado_tarea')
         read_only_Fields = ('id',)
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['estado'] = EstadoTareaSerializer(instance.estado).data
-        return response
 
 ### SERIALIZADOR PARA USER-TAREA###
 class UserTareaSerializer(serializers.ModelSerializer):
@@ -80,9 +68,8 @@ class UserTareaSerializer(serializers.ModelSerializer):
         read_only_Fields = ('id',)
 
     def to_representation(self, instance):
-        return {
-            'id': instance['id'],
-            'user': instance['user'],
-            'tarea': instance['tarea'],
-        }
+        response = super().to_representation(instance)
+        response['tarea'] = TareaSerializer(instance.tarea).data
+        response['user'] = UserSerializer(instance.user).data
+        return response
 

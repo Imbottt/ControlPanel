@@ -8,7 +8,8 @@ from user.serializers import (
     SuperUserSerializer, 
     UserSerializer, 
     AuthTokenSerializer, 
-    UserTokenSerializer)
+    UserTokenSerializer,
+    UpdateUserSerializer)
 from rest_framework import generics, authentication, permissions, status
 from rest_framework.authtoken.views import ObtainAuthToken, APIView
 from rest_framework.response import Response
@@ -176,7 +177,7 @@ class UserRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
     # Actualiza un usuario en específico
     def put(self, request, pk=None):
         if self.get_queryset(pk):
-            user_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
+            user_serializer = UpdateUserSerializer(self.get_queryset(pk), data = request.data)
             if user_serializer.is_valid():
                 user_serializer.save()
                 return Response({'message':'Usuario actualizado correctamente'}, status = status.HTTP_200_OK)

@@ -45,9 +45,9 @@ class UnidadSerializer(serializers.ModelSerializer):
 ### USUARIO ###
 class UserSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto de usuarios """
-
     class Meta:
         model = get_user_model()
+        creador = get_user_model().id
         fields = ('id','email','password','name','last_name','creador','rol','cargo','unidad')
         extra_kwargs = {
             'password':{
@@ -124,10 +124,23 @@ class AuthTokenSerializer(serializers.Serializer):
 
 #### USER TOKEN ####
 class UserTokenSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ('email','name','last_name','creador','rol','cargo','unidad')
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['rol'] = RolSerializer(instance.rol).data
+        response['cargo'] = CargoSerializer(instance.cargo).data
+        response['unidad'] = UnidadSerializer(instance.unidad).data
+        return response
+
+### ACTUALIZAR USUARIO ###
+class UpdateUserSerializer(serializers.ModelSerializer):
+    """ Serializador que actualiza a los usuarios sin pedir contraseña """
+    class Meta:
+        model = get_user_model()
+        fields = ['email','name','last_name','creador','rol','cargo','unidad']
 
     def to_representation(self, instance):
         response = super().to_representation(instance)

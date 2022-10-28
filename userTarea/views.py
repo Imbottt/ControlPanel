@@ -33,6 +33,7 @@ class UserTareaCreateListApiView(generics.ListCreateAPIView):
             return Response({
                 'message':'Tarea asignada correctamente'
             }, status = status.HTTP_201_CREATED)
+        return Response({'message':'Esa tarea ya está asignada'})
 
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 

@@ -30,7 +30,6 @@ admin.site.register(models.Rol) # Tabla Rol
 admin.site.register(models.Direccion) # Tabla Dirección
 admin.site.register(models.Unidad) # Tabla Unidad
 admin.site.register(models.UserTarea) # Tabla User - Tarea
-admin.site.register(models.EstadoTarea) # Tabla Estado de Tarea
 admin.site.register(models.Flujo) # Tabla Flujo
 admin.site.register(models.Tarea) # Tabla Tarea
 admin.site.register(models.TareaSubordinada) # Tabla Tarea Subordinada
