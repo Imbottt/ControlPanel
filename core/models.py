@@ -66,7 +66,6 @@ class Unidad(models.Model):
 class Rol(models.Model):
     """ Tabla para los roles """
     rol_name = models.CharField(max_length=30, unique=True)
-
     def __str__(self):
         return self.rol_name
 

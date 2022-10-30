@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     ## REST FRAMEWORK ##
     'rest_framework',
     'rest_framework.authtoken',
+
+    ## CORS
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'TaskControl.urls'
@@ -143,9 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User' # Dentro del app core llamamos al modelo User
 
 REST_FRAMEWORK = {
-
     'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S'
-
 }
 
 ## CORS
