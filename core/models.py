@@ -66,6 +66,7 @@ class Unidad(models.Model):
 class Rol(models.Model):
     """ Tabla para los roles """
     rol_name = models.CharField(max_length=30, unique=True)
+
     def __str__(self):
         return self.rol_name
 
@@ -76,6 +77,7 @@ class Cargo(models.Model):
 
     def __str__(self):
         return self.cargo_name
+
 
 ### TABLA USUARIO ###
 class User(AbstractBaseUser, PermissionsMixin):
@@ -136,6 +138,15 @@ class Tarea(models.Model):
     def __str__(self):
         return self.titulo_tarea
 
+    # PROGRESO
+    @property
+    def get_fecha_hoy(self):
+        return datetime.now()
+
+    @property
+    def get_progreso(self):
+        return self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy.strftime('%d-%m-%Y %H:%M:%S') 
+
     ## PLAZO
     @property
     def get_fecha_ini(self):
@@ -153,6 +164,7 @@ class Tarea(models.Model):
         self.fecha_inicio = self.get_fecha_ini
         self.fecha_limite = self.get_fecha_fin
         self.plazo_tarea = self.get_plazo
+        self.progreso_tarea = self.get_progreso
         super(Tarea, self).save(*args, **kwargs)
 
 ### TABLA USER - TAREA ###
