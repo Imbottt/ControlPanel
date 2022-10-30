@@ -10,14 +10,14 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 ###
 
-##############
-## CRUD ROL ##
-##############
+#################
+## CRUD UNIDAD ##
+#################
 
 ####################################################################################
 
 class UnidadCreateListApiView(generics.ListCreateAPIView):
-    """ Una vista que crea y lista los roles que existen en la BD """
+    """ Una vista que crea y lista las unidades que existen en la BD """
     serializer_class = UnidadSerializer
     queryset = UnidadSerializer.Meta.model.objects.all()
 
@@ -36,7 +36,7 @@ class UnidadCreateListApiView(generics.ListCreateAPIView):
 ####################################################################################
 
 class UnidadRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
-    """ Una vista que busca, actualiza y destruye los roles que existen en la BD """
+    """ Una vista que busca, actualiza y destruye las unidades que existen en la BD """
     serializer_class = UnidadSerializer
 
     # Consulta para traer todos las unidades que existen en la BD
@@ -59,8 +59,8 @@ class UnidadRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             unidad_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if unidad_serializer.is_valid():
                 unidad_serializer.save()
-                return Response(unidad_serializer.data, status = status.HTTP_200_OK)
-            return Response(unidad_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Unidad actualizada correctamente'}, status = status.HTTP_200_OK)
+            return Response({'error':'No existe esa unidad'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina una unidad en específico
     def delete(self, request, pk=None):

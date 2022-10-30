@@ -1,13 +1,19 @@
+from datetime import datetime
 from email.policy import default
-from lib2to3.pytree import Base
+from lib2to3.pytree import Base, convert
 from random import choices
-from tkinter import CASCADE
+from secrets import choice
+from time import strftime
+from tkinter import CASCADE, ROUND
 from unittest.util import _MAX_LENGTH
 from xml.etree.ElementInclude import default_loader
+from xmlrpc.client import _datetime_type
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from rest_framework.settings import api_settings
 
 from django.conf import settings
+from django.forms import DateField
 
 
 ##### MANAGER DEL USUARIO #####
@@ -39,7 +45,7 @@ class UserManager(BaseUserManager):
 
 ### TABLA DIRECCIÓN ###
 class Direccion(models.Model):
-    """ Modelo para la dirección """
+    """ Tabla para las direcciones """
     dir_name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -47,26 +53,29 @@ class Direccion(models.Model):
 
 ### TABLA UNIDAD ###
 class Unidad(models.Model):
-    """ Modelo para las unidades """
+    """ Tabla para las unidades """
     unidad_name = models.CharField(max_length=255, unique=True)
+
+    # Claves foráneas
+    dir = models.ForeignKey(Direccion, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.unidad_name
 
 ### TABLA ROL ###
 class Rol(models.Model):
-    """ Modelo de los roles para los usuarios """
+    """ Tabla para los roles """
     rol_name = models.CharField(max_length=30, unique=True)
-    # Llaves foráneas
-    unidad_id = models.ForeignKey(Unidad, null=True, blank=True, on_delete= models.CASCADE)
-
     def __str__(self):
         return self.rol_name
 
 ### TABLA CARGO ### ---> Funciona como una tabla que alberga sub-roles
 class Cargo(models.Model):
-    """ Modelo de los cargos para los usuarios """
-    cargo_name = models.CharField(max_length=255, unique=True)
+    """ Tabla para los cargos """
+    cargo_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.cargo_name
 
 ### TABLA USUARIO ###
 class User(AbstractBaseUser, PermissionsMixin):
@@ -77,10 +86,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    ## Llaves foráneas
-    rol_id = models.ForeignKey(Rol, null=True, blank=True, on_delete= models.CASCADE)
-    dir_id = models.ForeignKey(Direccion, null=True, blank=True, on_delete= models.CASCADE)
-    cargo_id = models.ForeignKey(Cargo, null=True, blank=True, on_delete=models.CASCADE)
+    creador = models.IntegerField(default=0)
+
+    ## Claves foráneas
+    rol = models.ForeignKey(Rol, null=True, on_delete=models.CASCADE)
+    cargo = models.ForeignKey(Cargo, null=True, on_delete=models.CASCADE)
+    unidad = models.ForeignKey(Unidad, null=True, on_delete=models.CASCADE)
 
     objects = UserManager()
 
@@ -92,76 +103,113 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 ### TABLA FLUJO ###
 class Flujo(models.Model):
-    """ Modelo para los flujos """
-    titulo_flujo = models.CharField(max_length=30, unique=True)
-
-    def __str__(self):
-        return self.titulo_flujo
-
-### TABLA DETALLE-FLUJO ###
-class DetalleFlujo(models.Model):
-    """ Modelo para el detalle de flujo """
+    """ Tabla para los flujos """
+    flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
     fecha_creacion = models.DateField(null=True)
+    fecha_inicio = models.DateField(null=True)
     fecha_fin = models.DateField(null=True)
 
-    # Llaves foráneas
-    flujo_id = models.ForeignKey(Flujo, null=True, blank=True, on_delete=models.CASCADE)
+    # Clave foránea
+    user = models.ForeignKey(User, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return self.descripcion_flujo
+        return self.flujo_name
 
 ### TABLA TAREA ###
+estado_choices = (
+    ("Sin asignar", "Sin asignar"), 
+    ("En progreso", "En progreso"), 
+    ("Finalizada", "Finalizada"), 
+) 
 class Tarea(models.Model):
-    """ Modelo de las tareas """
-    titulo_tarea = models.CharField(max_length=30, unique=True)
+    """ Tabla de las tareas """
+    titulo_tarea = models.CharField(max_length=50, unique=True)
     descripcion_tarea = models.CharField(max_length=255)
-    fecha_creacion = models.DateField(null=True)
-    fecha_limite = models.DateField(null=True)
+    fecha_creacion = (datetime.now()).strftime('%d-%m-%Y %H:%M:%S') 
+    fecha_inicio = models.DateTimeField(null=True)
+    fecha_limite = models.DateTimeField(null=True) 
+    plazo_tarea = models.CharField(max_length=255)
     progreso_tarea = models.CharField(max_length=255)
-
-    detalle_flujo_id = models.ForeignKey(DetalleFlujo, null=True, blank=True, on_delete=models.CASCADE)
+    estado_tarea = models.CharField(max_length=12, choices=estado_choices, default='Sin asignar')
 
     def __str__(self):
         return self.titulo_tarea
 
+    ## PLAZO
+    @property
+    def get_fecha_ini(self):
+        return self.fecha_inicio
+
+    @property
+    def get_fecha_fin(self):
+        return self.fecha_limite
+
+    @property
+    def get_plazo(self):
+        return (self.get_fecha_fin - self.get_fecha_ini)
+
+    def save(self, *args, **kwargs):
+        self.fecha_inicio = self.get_fecha_ini
+        self.fecha_limite = self.get_fecha_fin
+        self.plazo_tarea = self.get_plazo
+        super(Tarea, self).save(*args, **kwargs)
+
+### TABLA USER - TAREA ###
+class UserTarea(models.Model):
+    """ Tabla de flujo - tarea """
+    # Claves foráneas
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.asignacion
+
+### TABLA ALERTA ###
+alerta_choices = (
+    ("0", "--------"), 
+    ("1", "Acepto"), 
+    ("2", "Rechazo"), 
+) 
+
+class Alertas(models.Model):
+    """ Tabla de Alertas """
+    confirmacion = models.CharField(max_length=10, choices=alerta_choices, default=0)
+    justificacion = models.CharField(max_length=255)
+
+    # Claves foráneas
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.id, self.confirmacion
+
 ### TABLA TAREA SUBORDINADA ###
 class TareaSubordinada(models.Model):
-    """ Modelo para las tareas subordinadas """
-    titulo_tarea_sub = models.CharField(max_length=30, unique=True)
-    descripcion_tarea_sub = models.CharField(max_length=255)
+    """ Tabla para las tareas subordinadas """
+    titulo_subTarea = models.CharField(max_length=30, unique=True)
+    descripcion_subTarea = models.CharField(max_length=255)
+    fecha_creacion = models.DateField(null=True)
+    fecha_inicio = models.DateField(null=True)
+    fecha_fin = models.DateField(null=True)
 
     # Llaves foráneas
-    tarea_id = models.ForeignKey(Tarea, null=True, blank=True, on_delete=models.CASCADE)
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.titulo_tarea_sub
-
-### TABLA ESTADO TAREA ###
-class EstadoTarea(models.Model):
-    """ Modelo para los estados de la tarea """
-    estado_name = models.CharField(max_length=30, unique=True)
-    descripcion_estado = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.estado_name
+        return self.titulo_subTarea
 
 ### TABLA REGISTRO-EJECUCIÓN ###
 class RegistroEjecucion(models.Model):
-    """ Modelo para el registro de ejecución """
-    titulo_registro = models.CharField(max_length=255, unique=True)
-    confirmacion = models.BooleanField(null=True)
-    justificacion = models.CharField(max_length=255)
-    observacion = models.CharField(max_length=255)
-    fecha_registro = models.DateField(null=True)
+    """ Tabla para el registro de ejecución """
+    titulo_reg = models.CharField(max_length=255, unique=True)
+    fecha_reg = models.DateField(null=True)
 
-    # Llaves foráneas
-    estado_t_id = models.ForeignKey(EstadoTarea, null=True, blank=True, on_delete=models.CASCADE)
-    tarea_sub_id = models.ForeignKey(TareaSubordinada, null=True, blank=True, on_delete=models.CASCADE)
-    usuario_id = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    # Claves foráneas
+    userTarea = models.ForeignKey(UserTarea, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.titulo_registro
+        return self.titulo_reg
+
 
 
 
