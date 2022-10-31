@@ -126,7 +126,7 @@ class AuthTokenSerializer(serializers.Serializer):
 class UserTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email','name','last_name','creador','rol','cargo','unidad')
+        fields = ('id','email','name','last_name','creador','rol','cargo','unidad')
 
     def to_representation(self, instance):
         response = super().to_representation(instance)

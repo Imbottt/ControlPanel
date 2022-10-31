@@ -12,6 +12,7 @@ from userTarea.serializers import UserTareaSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
+from django_filters.rest_framework import DjangoFilterBackend
 
 #####################
 ## CRUD USER-TAREA ##
@@ -23,6 +24,8 @@ class UserTareaCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los usuarios y tareas que existen en la BD """
     serializer_class = UserTareaSerializer
     queryset = UserTareaSerializer.Meta.model.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user','tarea','estado_tarea']
 
     # Función para asignar una tarea a un usuario
     def post(self, request):
