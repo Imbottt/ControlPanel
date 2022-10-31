@@ -17,6 +17,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.settings import api_settings
 from rest_framework import viewsets
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 ### Modelo de la BD ###
 from core.models import User
 ### Serializadores ###
@@ -130,7 +132,6 @@ class Logout(APIView):
 ###############
 
 ####################################################################################
-
 class UserCreateListApiView(generics.ListCreateAPIView):
     # PERMISOS
     #authentication_classes = (authentication.TokenAuthentication,)
@@ -138,6 +139,9 @@ class UserCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los usuarios que existen en la BD """
     serializer_class = UserSerializer
     queryset = UserSerializer.Meta.model.objects.all()
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creador', 'rol']
 
     # Función para crear nuevos usuarios
     def post(self, request):
@@ -192,5 +196,4 @@ class UserRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             return Response({'message':'Usuario eliminado correctamente'}, status = status.HTTP_200_OK)
         return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
 
-
-
+###########################################################################################################

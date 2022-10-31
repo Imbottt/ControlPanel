@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     ## REST FRAMEWORK ##
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
 
     ## CORS
     'corsheaders',
@@ -148,6 +149,7 @@ AUTH_USER_MODEL = 'core.User' # Dentro del app core llamamos al modelo User
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S'
+    #'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 ## CORS

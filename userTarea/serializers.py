@@ -42,7 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto de usuarios """
     class Meta:
         model = get_user_model()
-        fields = ['email','name','last_name','rol','cargo','unidad']
+        fields = ['id','email','name','last_name','rol','cargo','unidad']
+        read_only_Fields = ('id',)
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
@@ -56,7 +57,7 @@ class TareaSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Tarea """
     class Meta:
         model = Tarea
-        fields = ('id','titulo_tarea','descripcion_tarea','fecha_creacion','fecha_inicio','fecha_limite','progreso_tarea','estado_tarea')
+        fields = ('id','titulo_tarea','descripcion_tarea','fecha_creacion','fecha_inicio','fecha_limite','progreso_tarea','creador_tarea')
         read_only_Fields = ('id',)
 
 ### SERIALIZADOR PARA USER-TAREA###
@@ -64,7 +65,7 @@ class UserTareaSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Rol """
     class Meta:
         model = UserTarea
-        fields = ['id','user','tarea']
+        fields = ['id','user','tarea','estado_tarea','asignador']
         read_only_Fields = ('id',)
 
     def to_representation(self, instance):

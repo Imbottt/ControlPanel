@@ -119,11 +119,6 @@ class Flujo(models.Model):
         return self.flujo_name
 
 ### TABLA TAREA ###
-estado_choices = (
-    ("Sin asignar", "Sin asignar"), 
-    ("En progreso", "En progreso"), 
-    ("Finalizada", "Finalizada"), 
-) 
 class Tarea(models.Model):
     """ Tabla de las tareas """
     titulo_tarea = models.CharField(max_length=50, unique=True)
@@ -133,7 +128,7 @@ class Tarea(models.Model):
     fecha_limite = models.DateTimeField(null=True) 
     plazo_tarea = models.CharField(max_length=255)
     progreso_tarea = models.CharField(max_length=255)
-    estado_tarea = models.CharField(max_length=12, choices=estado_choices, default='Sin asignar')
+    creador_tarea = models.IntegerField(default=0)
 
     def __str__(self):
         return self.titulo_tarea
@@ -145,7 +140,7 @@ class Tarea(models.Model):
 
     @property
     def get_progreso(self):
-        return self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy.strftime('%d-%m-%Y %H:%M:%S') 
+        return self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy
 
     ## PLAZO
     @property
@@ -170,12 +165,22 @@ class Tarea(models.Model):
 ### TABLA USER - TAREA ###
 class UserTarea(models.Model):
     """ Tabla de flujo - tarea """
+
+    estado_choices = (
+    ("Sin asignar", "1"), 
+    ("En progreso", "2"), 
+    ("Finalizada", "3"),
+    ) 
+
+    asignador = models.IntegerField(default=0) # Usuario que asignó la tarea
+
     # Claves foráneas
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
+    estado_tarea = models.CharField(max_length=12, choices=estado_choices, default='Sin asignar')
 
     def __str__(self):
-        return self.asignacion
+        return self.asignador
 
 ### TABLA ALERTA ###
 alerta_choices = (
