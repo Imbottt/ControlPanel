@@ -60,7 +60,7 @@ class RegistroExeRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIV
             if flujo_serializer.is_valid():
                 flujo_serializer.save()
                 return Response({'message':'Registro de ejecución actualizado correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe ese registro de ejecución'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar ese registro de ejecución, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un registro de ejecución en específico
     def delete(self, request, pk=None):
@@ -69,4 +69,4 @@ class RegistroExeRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIV
         if flujo_destroy:
             flujo_destroy.delete()
             return Response({'message':'Registro de ejecución eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese registro de ejecución'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar ese registro de ejecución, no existe'}, status = status.HTTP_400_BAD_REQUEST)

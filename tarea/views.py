@@ -59,8 +59,8 @@ class TareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             tarea_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if tarea_serializer.is_valid():
                 tarea_serializer.save()
-                return Response(tarea_serializer.data, status = status.HTTP_200_OK)
-            return Response(tarea_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Tarea actualizada correctamente'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar esa tarea, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina una tarea en específico
     def delete(self, request, pk=None):
@@ -69,7 +69,7 @@ class TareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if tarea_destroy:
             tarea_destroy.delete()
             return Response({'message':'Tarea eliminada correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe esa tarea'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar esa tarea, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 

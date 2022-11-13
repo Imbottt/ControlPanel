@@ -4,15 +4,15 @@ from rest_framework.permissions import IsAuthenticated
 ### Modelo de la BD ###
 from core.models import Flujo
 ### Serializadores ###
-from flujo.serializers import FlujoSerializer
+from flujo.serializers import FlujoSerializer, UpdateFlujoSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
 
-##############
-## CRUD ROL ##
-##############
+################
+## CRUD FLUJO ##
+################
 
 ####################################################################################
 
@@ -56,11 +56,11 @@ class FlujoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
     # Actualiza un flujo en específico
     def put(self, request, pk=None):
         if self.get_queryset(pk):
-            flujo_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
+            flujo_serializer = UpdateFlujoSerializer(self.get_queryset(pk), data = request.data) 
             if flujo_serializer.is_valid():
                 flujo_serializer.save()
                 return Response({'message':'flujo actualizado correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe ese flujo'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar ese flujo, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un flujo en específico
     def delete(self, request, pk=None):
@@ -69,7 +69,7 @@ class FlujoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if flujo_destroy:
             flujo_destroy.delete()
             return Response({'message':'flujo eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese flujo'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar ese flujo, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 

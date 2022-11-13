@@ -8,3 +8,4 @@ class RolSerializer(serializers.ModelSerializer):
         model = Rol
         fields = ('id','rol_name')
         read_only_Fields = ('id',)
+ 

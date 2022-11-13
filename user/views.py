@@ -185,7 +185,7 @@ class UserRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             if user_serializer.is_valid():
                 user_serializer.save()
                 return Response({'message':'Usuario actualizado correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar ese usuario, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un usuario en específico
     def delete(self, request, pk=None):
@@ -194,6 +194,6 @@ class UserRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if destroy:
             destroy.delete()
             return Response({'message':'Usuario eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese usuario'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar ese usuario, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
 ###########################################################################################################

@@ -62,7 +62,7 @@ class TareaSerializer(serializers.ModelSerializer):
 
 ### SERIALIZADOR PARA USER-TAREA###
 class UserTareaSerializer(serializers.ModelSerializer):
-    """ Serializador para el objeto Rol """
+    """ Serializador para el objeto UserTarea """
     class Meta:
         model = UserTarea
         fields = ['id','user','tarea','estado_tarea','asignador']

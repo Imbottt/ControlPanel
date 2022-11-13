@@ -60,7 +60,7 @@ class UnidadRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             if unidad_serializer.is_valid():
                 unidad_serializer.save()
                 return Response({'message':'Unidad actualizada correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe esa unidad'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar la unidad, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina una unidad en específico
     def delete(self, request, pk=None):
@@ -69,4 +69,4 @@ class UnidadRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if unidad_destroy:
             unidad_destroy.delete()
             return Response({'message':'Unidad eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe esa unidad'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar la unidad, no existe'}, status = status.HTTP_400_BAD_REQUEST)

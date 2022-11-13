@@ -20,3 +20,8 @@ class UnidadSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['dir'] = DirSerializer(instance.dir).data
         return response
+
+    def validate_dirKey(self, data):
+        if 'dir' not in data.keys():
+            raise serializers.ValidationError("Debe ingresar una dirección válida")
+        return data

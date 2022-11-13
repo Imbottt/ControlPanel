@@ -27,10 +27,7 @@ class RolCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Rol creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response({'message':'Rol creado correctamente'}, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
@@ -45,7 +42,7 @@ class RolRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             return self.get_serializer().Meta.model.objects.all()
         else:
             return self.get_serializer().Meta.model.objects.filter(id=pk).first()
-
+ 
     # Obtiene un rol en específico
     def patch(self, request, pk=None):
         if self.get_queryset(pk):
@@ -59,8 +56,8 @@ class RolRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             rol_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if rol_serializer.is_valid():
                 rol_serializer.save()
-                return Response(rol_serializer.data, status = status.HTTP_200_OK)
-            return Response(rol_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Rol actualizado correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No se puede actualizar ese rol, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un rol en específico
     def delete(self, request, pk=None):
@@ -69,7 +66,7 @@ class RolRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if rol_destroy:
             rol_destroy.delete()
             return Response({'message':'Rol eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese rol'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar el rol, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 
