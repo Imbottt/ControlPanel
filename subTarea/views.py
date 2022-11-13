@@ -59,8 +59,8 @@ class SubTareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView
             subtarea_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if subtarea_serializer.is_valid():
                 subtarea_serializer.save()
-                return Response(subtarea_serializer.data, status = status.HTTP_200_OK)
-            return Response(subtarea_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Tarea subordinada actualizada correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No se puede actualizar esa tarea subordinada, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina una tarea subordinada en específico
     def delete(self, request, pk=None):
@@ -69,7 +69,7 @@ class SubTareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView
         if subtarea_destroy:
             subtarea_destroy.delete()
             return Response({'message':'Tarea subordinada eliminada correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe esa tarea subordinada'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar esa tarea subordinada, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 

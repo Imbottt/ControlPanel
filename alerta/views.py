@@ -30,10 +30,7 @@ class AlertaCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Alerta creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response({'message':'Alerta creado correctamente'}, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
@@ -56,20 +53,20 @@ class AlertaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             return Response(alerta_serializer.data, status = status.HTTP_200_OK)
         return Response({'error':'No existe ese cargo'}, status = status.HTTP_400_BAD_REQUEST)
     
-    # Actualiza un cargo en específico
+    # Actualiza una alerta en específico
     def put(self, request, pk=None):
         if self.get_queryset(pk):
             alter = self.serializer_class(self.get_queryset(pk), data = request.data)
             if alter.is_valid():
                 alter.save()
                 return Response({'message':'Alerta actualizada correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe esa alerta'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar esa alerta, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
-    # Elimina un cargo en específico
+    # Elimina una alerta en específico
     def delete(self, request, pk=None):
         destroy = self.get_queryset().filter(id = pk).first()
 
         if destroy:
             destroy.delete()
             return Response({'message':'Alerta eliminada correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe esa alerta'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar esa alerta, no existe'}, status = status.HTTP_400_BAD_REQUEST)

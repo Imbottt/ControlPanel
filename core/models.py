@@ -57,7 +57,7 @@ class Unidad(models.Model):
     unidad_name = models.CharField(max_length=255, unique=True)
 
     # Claves foráneas
-    dir = models.ForeignKey(Direccion, null=True, on_delete=models.CASCADE)
+    dir = models.ForeignKey(Direccion, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA LA DIRECCIÓN, LA UNIDAD PERMANECE
 
     def __str__(self):
         return self.unidad_name
@@ -91,9 +91,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     creador = models.IntegerField(default=0)
 
     ## Claves foráneas
-    rol = models.ForeignKey(Rol, null=True, on_delete=models.CASCADE)
-    cargo = models.ForeignKey(Cargo, null=True, on_delete=models.CASCADE)
-    unidad = models.ForeignKey(Unidad, null=True, on_delete=models.CASCADE)
+    rol = models.ForeignKey(Rol, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA EL ROL, EL USUARIO PERMANECE
+    cargo = models.ForeignKey(Cargo, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA EL CARGO, EL USUARIO PERMANECE
+    unidad = models.ForeignKey(Unidad, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA LA UNIDAD, EL USUARIO PERMANECE
 
     objects = UserManager()
 
@@ -108,12 +108,29 @@ class Flujo(models.Model):
     """ Tabla para los flujos """
     flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
-    fecha_creacion = models.DateField(null=True)
-    fecha_inicio = models.DateField(null=True)
-    fecha_fin = models.DateField(null=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
+    fecha_inicio = models.DateTimeField(null=True)
+    fecha_fin = models.DateTimeField(null=True)
+    plazo_flujo = models.CharField(max_length=255, null=True)
 
-    # Clave foránea
-    user = models.ForeignKey(User, null=True, on_delete=models.DO_NOTHING)
+    @property
+    def get_fecha_fin(self):
+        f_fin = self.fecha_fin
+        return f_fin
+
+    @property
+    def get_fecha_creacion(self):
+        f_creacion = self.fecha_creacion
+        return f_creacion
+
+    @property
+    def get_plazo_flujo(self):
+        plazo_f = self.get_fecha_fin - self.get_fecha_creacion
+        return plazo_f
+
+    def save(self, *args, **kwargs):
+        self.plazo_flujo = self.get_plazo_flujo
+        super(Flujo, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.flujo_name
@@ -123,7 +140,7 @@ class Tarea(models.Model):
     """ Tabla de las tareas """
     titulo_tarea = models.CharField(max_length=50, unique=True)
     descripcion_tarea = models.CharField(max_length=255)
-    fecha_creacion = (datetime.now()).strftime('%d-%m-%Y %H:%M:%S') 
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
     fecha_inicio = models.DateTimeField(null=True)
     fecha_limite = models.DateTimeField(null=True) 
     plazo_tarea = models.CharField(max_length=255)
@@ -172,15 +189,27 @@ class UserTarea(models.Model):
     ("Finalizada", "3"),
     ) 
 
-    asignador = models.IntegerField(default=0) # Usuario que asignó la tarea
+    asignador = models.IntegerField() # Usuario que asignó la tarea
 
     # Claves foráneas
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
-    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
-    estado_tarea = models.CharField(max_length=12, choices=estado_choices, default='Sin asignar')
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE) # SI SE BORRA EL USUARIO, LA ASIGNACIÓN TAMBIÉN SE BORRARÁ
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE) # SI SE BORRA LA TAREA, LA ASIGNACIÓN TAMBIÉN SE BORRARÁ
+    estado_tarea = models.CharField(max_length=12, choices=estado_choices, default=None)
 
     def __str__(self):
-        return self.asignador
+        return str(self.asignador)
+
+### TABLA USER - FLUJO ###
+class UserFlujo(models.Model):
+    """ Tabla de flujo - tarea """
+    asignador = models.IntegerField() # Usuario que asignó el flujo
+
+    # Claves foráneas
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE) # SI SE BORRA EL USUARIO, LA ASIGNACIÓN TAMBIEN SE BORRARÁ
+    flujo = models.ForeignKey(Flujo, null=True, on_delete=models.CASCADE) # SI SE BORRA EL USUARIO, LA ASIGNACIÓN TAMBIÉN SE BORRARÁ
+
+    def __str__(self):
+        return str(self.asignador)
 
 ### TABLA ALERTA ###
 alerta_choices = (
@@ -198,16 +227,16 @@ class Alertas(models.Model):
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.id, self.confirmacion
+        return self.confirmacion
 
 ### TABLA TAREA SUBORDINADA ###
 class TareaSubordinada(models.Model):
     """ Tabla para las tareas subordinadas """
     titulo_subTarea = models.CharField(max_length=30, unique=True)
     descripcion_subTarea = models.CharField(max_length=255)
-    fecha_creacion = models.DateField(null=True)
-    fecha_inicio = models.DateField(null=True)
-    fecha_fin = models.DateField(null=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
+    fecha_inicio = models.DateTimeField(null=True)
+    fecha_fin = models.DateTimeField(null=True)
 
     # Llaves foráneas
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
@@ -219,10 +248,11 @@ class TareaSubordinada(models.Model):
 class RegistroEjecucion(models.Model):
     """ Tabla para el registro de ejecución """
     titulo_reg = models.CharField(max_length=255, unique=True)
-    fecha_reg = models.DateField(null=True)
+    fecha_reg = models.DateTimeField(auto_now_add=True, null=True)
 
     # Claves foráneas
     userTarea = models.ForeignKey(UserTarea, null=True, on_delete=models.CASCADE)
+    userFlujo = models.ForeignKey(UserFlujo, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.titulo_reg

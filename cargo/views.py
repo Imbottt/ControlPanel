@@ -16,7 +16,7 @@ from rest_framework import status, generics
 ################
 ## CRUD CARGO ##
 ################
-
+ 
 ####################################################################################
 
 class CargoCreateListApiView(generics.ListCreateAPIView):
@@ -30,10 +30,7 @@ class CargoCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Cargo creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response({'message':'Cargo creado correctamente'}, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
@@ -63,7 +60,7 @@ class CargoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             if cargo_serializer.is_valid():
                 cargo_serializer.save()
                 return Response({'message':'Cargo actualizada correctamente'}, status = status.HTTP_200_OK)
-            return Response({'error':'No existe ese cargo'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede actualizar ese cargo, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina un cargo en específico
     def delete(self, request, pk=None):
@@ -72,4 +69,4 @@ class CargoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if destroy:
             destroy.delete()
             return Response({'message':'Cargo eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese cargo'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar ese cargo, no existe'}, status = status.HTTP_400_BAD_REQUEST)

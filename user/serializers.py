@@ -47,7 +47,6 @@ class UserSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto de usuarios """
     class Meta:
         model = get_user_model()
-        creador = get_user_model().id
         fields = ('id','email','password','name','last_name','creador','rol','cargo','unidad')
         extra_kwargs = {
             'password':{

@@ -23,15 +23,12 @@ class DirCreateListApiView(generics.ListCreateAPIView):
 
     # Función para crear nuevas direcciones
     def post(self, request):
-        serializer = self.serializer_class(data = request.data)
+        dir_serializer = self.serializer_class(data = request.data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message':'Dirección creada correctamente'
-            }, status = status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        if dir_serializer.is_valid():
+            dir_serializer.save()
+            return Response({'message':'Dirección creada correctamente'}, status = status.HTTP_201_CREATED)
+        return Response(dir_serializer.data, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
 
@@ -59,17 +56,17 @@ class DirRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             dir_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if dir_serializer.is_valid():
                 dir_serializer.save()
-                return Response(dir_serializer.data, status = status.HTTP_200_OK)
-            return Response(dir_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
+                return Response({'message':'Dirección actualizada correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No se puede actualizar esa dirección, no existe'}, status = status.HTTP_400_BAD_REQUEST)
+    
     # Elimina una dirección en específico
     def delete(self, request, pk=None):
         dir_destroy = self.get_queryset().filter(id = pk).first()
-
         if dir_destroy:
             dir_destroy.delete()
             return Response({'message':'Dirección eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No existe esa dirección'}, status = status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error':'No se puede eliminar la dirección, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 
