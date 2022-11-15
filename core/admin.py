@@ -36,3 +36,4 @@ admin.site.register(models.TareaSubordinada) # Tabla Tarea Subordinada
 admin.site.register(models.RegistroEjecucion) # Tabla Dirección
 admin.site.register(models.Cargo) # Tabla Cargo
 admin.site.register(models.Alertas) # Tabla Alerta
+admin.site.register(models.RegistroFlujo)# Tabla Registro Flujos

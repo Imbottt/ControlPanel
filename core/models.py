@@ -108,10 +108,16 @@ class Flujo(models.Model):
     """ Tabla para los flujos """
     flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
-    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
-    fecha_inicio = models.DateTimeField(null=True)
-    fecha_fin = models.DateTimeField(null=True)
-    plazo_flujo = models.CharField(max_length=255, null=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    plazo_flujo = models.CharField(max_length=255)
+    progreso_f = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=False)
+
+    @property
+    def get_fecha_hoy(self):
+        return datetime.now()
 
     @property
     def get_fecha_fin(self):
@@ -119,17 +125,17 @@ class Flujo(models.Model):
         return f_fin
 
     @property
-    def get_fecha_creacion(self):
-        f_creacion = self.fecha_creacion
-        return f_creacion
+    def get_plazo_flujo(self):
+        plazo_f = self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy
+        return plazo_f
 
     @property
-    def get_plazo_flujo(self):
-        plazo_f = self.get_fecha_fin - self.get_fecha_creacion
-        return plazo_f
+    def get_progeso_flujo(self):
+        progreso_f = self.fecha_inicio - self.get_plazo_flujo
 
     def save(self, *args, **kwargs):
         self.plazo_flujo = self.get_plazo_flujo
+        self.progreso_f = self.get_progeso_flujo
         super(Flujo, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -252,11 +258,21 @@ class RegistroEjecucion(models.Model):
 
     # Claves foráneas
     userTarea = models.ForeignKey(UserTarea, null=True, on_delete=models.CASCADE)
-    userFlujo = models.ForeignKey(UserFlujo, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.titulo_reg
 
+### TABLA REGISTRO-FLUJOS ###
+class RegistroFlujo(models.Model):
+    """ Tabla para el registro de flujos """
+    titulo_reg_f = models.CharField(max_length=255, unique=True)
+    fecha_reg = models.DateTimeField(auto_now_add=True)
+
+    # Llave foránea
+    userFlujo = models.ForeignKey(UserFlujo, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.titulo_reg_f
 
 
 
