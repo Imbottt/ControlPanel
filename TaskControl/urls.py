@@ -30,4 +30,5 @@ urlpatterns = [
     path('api/userTarea/', include('userTarea.urls')),
     path('api/userFlujo/', include('userFlujo.urls')),
     path('api/registroEjecucion/', include('registroEjecucion.urls')),
+    path('api/registroFlujo/', include('registroFlujo.urls')),
 ]
