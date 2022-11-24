@@ -27,10 +27,7 @@ class UnidadCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Unidad creada correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

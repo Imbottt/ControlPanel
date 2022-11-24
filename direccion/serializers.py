@@ -4,17 +4,11 @@ from core.models import Direccion
 ### SERIALIZADOR ###
 class DirSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Dirección """
+    dir_name = serializers.CharField(allow_null=False, required=True, allow_blank=False, min_length=4)
+    
     class Meta:
         model = Direccion
         fields = ['id','dir_name']
         read_only_Fields = ('id',)
-        extra_kwargs = {
-            'dir_name':{
-                'min_length': 4,
-                }
-            }
 
-    def validate_dir(self, value):
-        if value == '' or value == None:
-            raise serializers.ValidationError("Debe ingresar un valor en el campo vacío")
-        return value
+    

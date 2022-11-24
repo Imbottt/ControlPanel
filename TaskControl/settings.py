@@ -148,7 +148,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User' # Dentro del app core llamamos al modelo User
 
 REST_FRAMEWORK = {
-    'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S'
+    'DATETIME_FORMAT' : '%d-%m-%y %H:%M:%S',
+    'DATE_FORMAT' : '%d-%m-%y'
     #'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 

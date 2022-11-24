@@ -9,7 +9,7 @@ class TareaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tarea
         fields = ['id','titulo_tarea','descripcion_tarea','fecha_creacion','fecha_inicio','fecha_limite','plazo_tarea','progreso_tarea','creador_tarea']
-        read_only_Fields = ('id','plazo_tarea','progreso_tarea',)
+        read_only_Fields = ('id',)
 
     
     
