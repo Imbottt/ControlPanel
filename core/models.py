@@ -54,10 +54,10 @@ class Direccion(models.Model):
 ### TABLA UNIDAD ###
 class Unidad(models.Model):
     """ Tabla para las unidades """
-    unidad_name = models.CharField(max_length=255, unique=True)
+    unidad_name = models.CharField(max_length=255,null=True, unique=True)
 
     # Claves foráneas
-    dir = models.ForeignKey(Direccion, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA LA DIRECCIÓN, LA UNIDAD PERMANECE
+    dir = models.ForeignKey(Direccion, on_delete=models.CASCADE) # SI SE BORRA LA DIRECCIÓN, LA UNIDAD TAMBIÉN DESAPARECERÁ
 
     def __str__(self):
         return self.unidad_name
@@ -91,9 +91,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     creador = models.IntegerField(default=0)
 
     ## Claves foráneas
-    rol = models.ForeignKey(Rol, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA EL ROL, EL USUARIO PERMANECE
-    cargo = models.ForeignKey(Cargo, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA EL CARGO, EL USUARIO PERMANECE
-    unidad = models.ForeignKey(Unidad, null=True, on_delete=models.DO_NOTHING) # SI SE BORRA LA UNIDAD, EL USUARIO PERMANECE
+    rol = models.ForeignKey(Rol, null=True, on_delete=models.CASCADE) # SI SE BORRA EL ROL, EL USUARIO PERMANECE
+    cargo = models.ForeignKey(Cargo, null=True, on_delete=models.CASCADE) # SI SE BORRA EL CARGO, EL USUARIO PERMANECE
+    unidad = models.ForeignKey(Unidad, null=True, on_delete=models.CASCADE) # SI SE BORRA LA UNIDAD, EL USUARIO PERMANECE
 
     objects = UserManager()
 
@@ -108,16 +108,17 @@ class Flujo(models.Model):
     """ Tabla para los flujos """
     flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
+    fecha_creacion = models.DateField(auto_now_add=True)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
     plazo_flujo = models.CharField(max_length=255)
     progreso_f = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=False)
+    creador_flujo = models.IntegerField()
+    ejecutar = models.BooleanField(default=False)
 
     @property
     def get_fecha_hoy(self):
-        return datetime.now()
+        return datetime.now().date()
 
     @property
     def get_fecha_fin(self):
@@ -126,12 +127,12 @@ class Flujo(models.Model):
 
     @property
     def get_plazo_flujo(self):
-        plazo_f = self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy
+        plazo_f = self.get_fecha_fin - self.get_fecha_hoy
         return plazo_f
 
     @property
     def get_progeso_flujo(self):
-        progreso_f = self.fecha_inicio - self.get_plazo_flujo
+        return self.fecha_inicio - self.get_plazo_flujo
 
     def save(self, *args, **kwargs):
         self.plazo_flujo = self.get_plazo_flujo
@@ -146,12 +147,12 @@ class Tarea(models.Model):
     """ Tabla de las tareas """
     titulo_tarea = models.CharField(max_length=50, unique=True)
     descripcion_tarea = models.CharField(max_length=255)
-    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
-    fecha_inicio = models.DateTimeField(null=True)
-    fecha_limite = models.DateTimeField(null=True) 
+    fecha_creacion = models.DateField(auto_now_add=True)
+    fecha_inicio = models.DateField()
+    fecha_limite = models.DateField() 
     plazo_tarea = models.CharField(max_length=255)
     progreso_tarea = models.CharField(max_length=255)
-    creador_tarea = models.IntegerField(default=0)
+    creador_tarea = models.IntegerField()
 
     def __str__(self):
         return self.titulo_tarea
@@ -159,11 +160,11 @@ class Tarea(models.Model):
     # PROGRESO
     @property
     def get_fecha_hoy(self):
-        return datetime.now()
+        return datetime.now().date()
 
     @property
     def get_progreso(self):
-        return self.get_fecha_fin.replace(tzinfo=None) - self.get_fecha_hoy
+        return self.get_fecha_fin - self.get_fecha_hoy
 
     ## PLAZO
     @property

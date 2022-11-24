@@ -27,8 +27,8 @@ class DirCreateListApiView(generics.ListCreateAPIView):
 
         if dir_serializer.is_valid():
             dir_serializer.save()
-            return Response({'message':'Dirección creada correctamente'}, status = status.HTTP_201_CREATED)
-        return Response(dir_serializer.data, status = status.HTTP_400_BAD_REQUEST)
+            return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+        return Response(dir_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
 

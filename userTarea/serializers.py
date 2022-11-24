@@ -8,14 +8,16 @@ class RolSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Rol """
     class Meta:
         model = Rol
-        fields = ['rol_name']
+        fields = ['id','rol_name']
+        read_only_Fields = ('id',)
 
 ### SERIALIZADOR PARA EL CARGO ###
 class CargoSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Cargo """
     class Meta:
         model = Cargo
-        fields = ['cargo_name']
+        fields = ['id','cargo_name']
+        read_only_Fields = ('id',)
 
 #####
 ### SERIALIZADOR DE DIRECCIÓN ###
@@ -23,14 +25,16 @@ class DirSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Dirección """
     class Meta:
         model = Direccion
-        fields = ['dir_name']
+        fields = ['id','dir_name']
+        read_only_Fields = ('id',)
 
 ### SERIALIZADOR DE UNIDAD ###
 class UnidadSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Rol """
     class Meta:
         model = Unidad
-        fields = ['unidad_name','dir']
+        fields = ['id','unidad_name','dir']
+        read_only_Fields = ('id',)
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
