@@ -7,7 +7,7 @@ from core.models import Rol
 from rol.serializers import RolSerializer
 ### 
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status, generics, authentication, permissions
 ###
 
 ##############
@@ -18,6 +18,12 @@ from rest_framework import status, generics
 
 class RolCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los roles que existen en la BD """
+    ################################
+    # PERMISOS
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    ################################
     serializer_class = RolSerializer
     queryset = RolSerializer.Meta.model.objects.all()
 
@@ -34,6 +40,11 @@ class RolCreateListApiView(generics.ListCreateAPIView):
 
 class RolRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
     """ Una vista que busca, actualiza y destruye los roles que existen en la BD """
+    ################################
+    # PERMISOS
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    ################################
     serializer_class = RolSerializer
 
     # Consulta para traer todos los roles que existen en la BD

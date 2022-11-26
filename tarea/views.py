@@ -27,10 +27,7 @@ class TareaCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Tarea creada correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
@@ -59,7 +56,7 @@ class TareaRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
             tarea_serializer = self.serializer_class(self.get_queryset(pk), data = request.data)
             if tarea_serializer.is_valid():
                 tarea_serializer.save()
-                return Response({'message':'Tarea actualizada correctamente'}, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Tarea actualizada correctamente'}, status = status.HTTP_200_OK)
         return Response({'error':'No se puede actualizar esa tarea, no existe'}, status = status.HTTP_400_BAD_REQUEST)
 
     # Elimina una tarea en específico
