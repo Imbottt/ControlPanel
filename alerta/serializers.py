@@ -2,7 +2,7 @@ from rest_framework import serializers
 from core.models import Alertas
 
 
-### SERIALIZADOR PARA EL ROL ###
+### SERIALIZADOR PARA LA ALERTA ###
 class AlertaSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto alerta """
     class Meta:
