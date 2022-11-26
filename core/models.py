@@ -153,7 +153,7 @@ class Tarea(models.Model):
     fecha_limite = models.DateField()  
     plazo_tarea = models.CharField(max_length=255)
     progreso_tarea = models.CharField(max_length=255)
-    creador_tarea = models.PositiveIntegerField()
+    creador_tarea = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.titulo_tarea
@@ -190,12 +190,13 @@ class UserTarea(models.Model):
     """ Tabla de usuario - tarea """
 
     estado_choices = (
-    ("Sin asignar", "1"), 
-    ("En progreso", "2"), 
-    ("Finalizada", "3"),
+    ("1","Sin asignar"), 
+    ("2", "En progreso"), 
+    ("3","Finalizada"),
     ) 
 
-    asignador = models.IntegerField() # Usuario que asignó la tarea
+    #id_userTarea = models.AutoField(primary_key=True)
+    asignador = models.PositiveIntegerField() # Usuario que asignó la tarea
 
     # Claves foráneas
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE) # SI SE BORRA EL USUARIO, LA ASIGNACIÓN TAMBIÉN SE BORRARÁ
@@ -253,6 +254,7 @@ class TareaSubordinada(models.Model):
 ### TABLA REGISTRO-EJECUCIÓN ###
 class RegistroEjecucion(models.Model):
     """ Tabla para el registro de ejecución """
+    #id_regExe = models.AutoField(primary_key=True)
     titulo_reg = models.CharField(max_length=255, unique=True)
     fecha_reg = models.DateTimeField(auto_now_add=True, null=True)
 
