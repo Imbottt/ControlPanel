@@ -4,6 +4,9 @@ from core.models import Flujo
 ### SERIALIZADOR PARA EL FLUJO ###
 class FlujoSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Flujo """
+    fecha_inicio = serializers.DateField()
+    fecha_fin = serializers.DateField()
+    descripcion_flujo = serializers.CharField(allow_null=False, allow_blank=False)
     plazo_flujo = serializers.CharField(read_only=True)
     progreso_f = serializers.CharField(read_only=True)
     class Meta:

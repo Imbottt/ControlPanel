@@ -113,7 +113,7 @@ class Flujo(models.Model):
     fecha_fin = models.DateField()
     plazo_flujo = models.CharField(max_length=255)
     progreso_f = models.CharField(max_length=255)
-    creador_flujo = models.IntegerField()
+    creador_flujo = models.PositiveIntegerField()
     ejecutar = models.BooleanField(default=False)
 
     @property
@@ -127,12 +127,12 @@ class Flujo(models.Model):
 
     @property
     def get_plazo_flujo(self):
-        plazo_f = self.get_fecha_fin - self.get_fecha_hoy
+        plazo_f = self.get_fecha_fin - self.fecha_inicio
         return plazo_f
 
     @property
     def get_progeso_flujo(self):
-        return self.fecha_inicio - self.get_plazo_flujo
+        return self.fecha_fin - self.get_fecha_hoy
 
     def save(self, *args, **kwargs):
         self.plazo_flujo = self.get_plazo_flujo
@@ -145,14 +145,15 @@ class Flujo(models.Model):
 ### TABLA TAREA ###
 class Tarea(models.Model):
     """ Tabla de las tareas """
+    #id_tarea = models.AutoField(primary_key=True, unique=True)
     titulo_tarea = models.CharField(max_length=50, unique=True)
     descripcion_tarea = models.CharField(max_length=255)
     fecha_creacion = models.DateField(auto_now_add=True)
     fecha_inicio = models.DateField()
-    fecha_limite = models.DateField() 
+    fecha_limite = models.DateField()  
     plazo_tarea = models.CharField(max_length=255)
     progreso_tarea = models.CharField(max_length=255)
-    creador_tarea = models.IntegerField()
+    creador_tarea = models.PositiveIntegerField()
 
     def __str__(self):
         return self.titulo_tarea
@@ -180,15 +181,13 @@ class Tarea(models.Model):
         return (self.get_fecha_fin - self.get_fecha_ini)
 
     def save(self, *args, **kwargs):
-        self.fecha_inicio = self.get_fecha_ini
-        self.fecha_limite = self.get_fecha_fin
         self.plazo_tarea = self.get_plazo
         self.progreso_tarea = self.get_progreso
         super(Tarea, self).save(*args, **kwargs)
 
 ### TABLA USER - TAREA ###
 class UserTarea(models.Model):
-    """ Tabla de flujo - tarea """
+    """ Tabla de usuario - tarea """
 
     estado_choices = (
     ("Sin asignar", "1"), 
