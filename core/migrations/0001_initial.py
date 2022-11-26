@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ('fecha_fin', models.DateField()),
                 ('plazo_flujo', models.CharField(max_length=255)),
                 ('progreso_f', models.CharField(max_length=255)),
-                ('creador_flujo', models.IntegerField()),
+                ('creador_flujo', models.PositiveIntegerField()),
                 ('ejecutar', models.BooleanField(default=False)),
             ],
         ),
