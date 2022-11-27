@@ -190,7 +190,8 @@ class UserTarea(models.Model):
     """ Tabla de usuario - tarea """
 
     estado_choices = (
-    ("1","Sin asignar"), 
+    ("0","Sin asignar"),
+    ("1","Por empezar"), 
     ("2", "En progreso"), 
     ("3","Finalizada"),
     ) 
