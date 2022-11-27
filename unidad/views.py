@@ -20,7 +20,6 @@ class UnidadCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista las unidades que existen en la BD """
     serializer_class = UnidadSerializer
     queryset = UnidadSerializer.Meta.model.objects.all()
-
     # Función para crear nuevas unidades
     def post(self, request):
         serializer = self.serializer_class(data = request.data)

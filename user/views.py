@@ -141,7 +141,7 @@ class UserCreateListApiView(generics.ListCreateAPIView):
     queryset = UserSerializer.Meta.model.objects.all()
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['creador', 'rol']
+    filterset_fields = ['creador', 'rol', 'unidad']
 
     # Función para crear nuevos usuarios
     def post(self, request):
