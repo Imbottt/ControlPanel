@@ -113,6 +113,8 @@ class Flujo(models.Model):
     fecha_fin = models.DateField()
     plazo_flujo = models.CharField(max_length=255)
     progreso_f = models.CharField(max_length=255)
+    porc_avance = models.CharField(max_length=255)
+    vencimiento = models.CharField(max_length=255)
     creador_flujo = models.PositiveIntegerField()
     ejecutar = models.BooleanField(default=False)
 
@@ -122,25 +124,44 @@ class Flujo(models.Model):
 
     @property
     def get_fecha_fin(self):
-        f_fin = self.fecha_fin
-        return f_fin
+        return self.fecha_fin
 
     @property
-    def get_plazo_flujo(self):
-        plazo_f = self.get_fecha_fin - self.fecha_inicio
-        return plazo_f
+    def get_plazo_flujo(self): 
+        return self.get_fecha_fin - self.fecha_inicio
 
     @property
     def get_progeso_flujo(self):
         return self.fecha_fin - self.get_fecha_hoy
 
+    @property
+    def get_dias_trans(self):
+        return self.get_fecha_hoy - self.fecha_inicio
+
+    @property
+    def get_vencimiento(self):
+        vencimiento = self.get_fecha_hoy - self.get_fecha_fin
+        return vencimiento
+
+        if vencimiento > 7:
+            print("Atrasado")
+        else:
+            print("Sin atraso")
+
+    @property
+    def get_avance(self): 
+        return self.get_dias_trans * 100 / self.get_plazo_flujo
+        
+
     def save(self, *args, **kwargs):
         self.plazo_flujo = self.get_plazo_flujo
         self.progreso_f = self.get_progeso_flujo
+        self.porc_avance =  '%.2f' % (self.get_avance)
+        self.vencimiento = self.get_vencimiento
         super(Flujo, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.flujo_name
+        return self.flujo_name, "%.2f" % (self.porc_avance)
 
 ### TABLA TAREA ###
 class Tarea(models.Model):
@@ -194,6 +215,9 @@ class UserTarea(models.Model):
     ("1","Por empezar"), 
     ("2", "En progreso"), 
     ("3","Finalizada"),
+    ####################
+    ("4","Aceptada"),
+    ("5","Rechazada"),
     ) 
 
     #id_userTarea = models.AutoField(primary_key=True)

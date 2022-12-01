@@ -9,9 +9,11 @@ class FlujoSerializer(serializers.ModelSerializer):
     descripcion_flujo = serializers.CharField(allow_null=False, allow_blank=False)
     plazo_flujo = serializers.CharField(read_only=True)
     progreso_f = serializers.CharField(read_only=True)
+    porc_avance = serializers.CharField(read_only=True)
+    vencimiento = serializers.CharField(read_only=True)
     class Meta:
         model = Flujo
-        fields = ['id','flujo_name','descripcion_flujo','fecha_creacion','fecha_inicio','fecha_fin','plazo_flujo','progreso_f','creador_flujo','ejecutar']
+        fields = ['id','flujo_name','descripcion_flujo','fecha_creacion','fecha_inicio','fecha_fin','plazo_flujo','progreso_f','porc_avance','vencimiento','creador_flujo','ejecutar']
         read_only_Fields = ('id','fecha_creacion',)
     
     def create(self, validated_data):
@@ -32,7 +34,10 @@ class FlujoSerializer(serializers.ModelSerializer):
 class UpdateFlujoSerializer(serializers.ModelSerializer):
     """ Serializador para el actualizador del flujo """
     plazo_flujo = serializers.CharField(read_only=True)
+    progreso_f = serializers.CharField(read_only=True)
+    porc_avance = serializers.CharField(read_only=True)
+    vencimiento = serializers.CharField(read_only=True)
     class Meta:
         model = Flujo
-        fields = ['id','flujo_name','descripcion_flujo','fecha_inicio','fecha_fin','plazo_flujo','progreso_f','creador_flujo','ejecutar']
+        fields = ['id','flujo_name','descripcion_flujo','fecha_inicio','fecha_fin','plazo_flujo','progreso_f','porc_avance','vencimiento','creador_flujo','ejecutar']
         read_only_Fields = ('id','fecha_creacion',)
