@@ -25,7 +25,7 @@ class UserTareaCreateListApiView(generics.ListCreateAPIView):
     serializer_class = UserTareaSerializer
     queryset = UserTareaSerializer.Meta.model.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['user','tarea','estado_tarea']
+    filterset_fields = ['user','tarea','estado_tarea','asignador']
 
     # Función para asignar una tarea a un usuario
     def post(self, request):
