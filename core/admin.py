@@ -37,3 +37,5 @@ admin.site.register(models.RegistroEjecucion) # Tabla Dirección
 admin.site.register(models.Cargo) # Tabla Cargo
 admin.site.register(models.Alertas) # Tabla Alerta
 admin.site.register(models.RegistroFlujo)# Tabla Registro Flujos
+admin.site.register(models.Notificacion)# Tabla Notificacion
+admin.site.register(models.TareaRelacionada)# Tabla Tarea Relacionada

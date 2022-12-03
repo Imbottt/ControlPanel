@@ -106,59 +106,35 @@ class Flujo(models.Model):
     flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
     fecha_creacion = models.DateField(auto_now_add=True)
+    fecha_actualizacion = models.DateField(auto_now=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
-    plazo_flujo = models.CharField(max_length=255)
-    progreso_f = models.CharField(max_length=255)
-    porc_avance = models.CharField(max_length=255)
-    vencimiento = models.CharField(max_length=255)
+    plazo_flujo = models.CharField(max_length=50)
     creador_flujo = models.PositiveIntegerField()
     ejecutar = models.BooleanField(default=False)
 
+    # Fecha de ahora
     @property
-    def get_fecha_hoy(self):
-        return datetime.now().date()
-
+    def fecha_actual(self):
+        fecha_ahora = datetime.now().date()
+        return fecha_ahora
+    
+    # Plazo
     @property
-    def get_fecha_fin(self):
-        return self.fecha_fin
+    def get_plazo_f(self):
+        fecha_fin = self.fecha_fin
+        fecha_inicio = self.fecha_inicio
+        plazo = fecha_fin - fecha_inicio
+        return plazo.days
 
-    @property
-    def get_plazo_flujo(self): 
-        return self.get_fecha_fin - self.fecha_inicio
-
-    @property
-    def get_progeso_flujo(self):
-        return self.fecha_fin - self.get_fecha_hoy
-
-    @property
-    def get_dias_trans(self):
-        return self.get_fecha_hoy - self.fecha_inicio
-
-    @property
-    def get_vencimiento(self):
-        vencimiento = self.get_fecha_hoy - self.get_fecha_fin
-        return vencimiento
-
-        if vencimiento > 7:
-            print("Atrasado")
-        else:
-            print("Sin atraso")
-
-    @property
-    def get_avance(self): 
-        return self.get_dias_trans * 100 / self.get_plazo_flujo
-        
+    # Cálculo % de avances
 
     def save(self, *args, **kwargs):
-        self.plazo_flujo = self.get_plazo_flujo
-        self.progreso_f = self.get_progeso_flujo
-        self.porc_avance =  '%.2f' % (self.get_avance)
-        self.vencimiento = self.get_vencimiento
+        self.plazo_flujo = self.get_plazo_f
         super(Flujo, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.flujo_name, "%.2f" % (self.porc_avance)
+        return self.flujo_name
 
 ### TABLA TAREA ###
 class Tarea(models.Model):
@@ -240,23 +216,15 @@ class UserFlujo(models.Model):
     def __str__(self):
         return str(self.asignador)
 
-### TABLA ALERTA ###
-alerta_choices = (
-    ("0", "--------"), 
-    ("1", "Acepto"), 
-    ("2", "Rechazo"), 
-) 
-
-class Alertas(models.Model):
+### TABLA REPORTE ###
+class Reporte(models.Model):
     """ Tabla de Alertas """
-    confirmacion = models.CharField(max_length=10, choices=alerta_choices, default=0)
     justificacion = models.CharField(max_length=255)
-
     # Claves foráneas
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.confirmacion
+        return self.justificacion
 
 ### TABLA TAREA SUBORDINADA ###
 class TareaSubordinada(models.Model):
@@ -298,9 +266,29 @@ class RegistroFlujo(models.Model):
     def __str__(self):
         return self.titulo_reg_f
 
+### TABLA NOTIFICACIÓN ###
+class Notificacion(models.Model):
+    """ Tabla para las notificaciones """
+    id_notificador = models.PositiveIntegerField()
+    id_notificado = models.PositiveIntegerField()
+    mensaje = models.CharField(max_length=100)
+    fecha_creacion = models.DateField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
+    # Clave foránea
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.is_read
 
+### TABLA TAREA RELACIONADA ###
+class TareaRelacionada(models.Model):
+    """ Tabla para las tareas relacionadas """
+    id_tarea_main = models.PositiveIntegerField(null=True)
+    id_tarea_relational = models.PositiveIntegerField(null=True)
+
+    def __str__(self):
+        return str(self.id_tarea_main)
 
 
 

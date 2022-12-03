@@ -2,74 +2,68 @@
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 ### Modelo de la BD ###
-from core.models import Flujo
+from core.models import Notificacion
 ### Serializadores ###
-from flujo.serializers import FlujoSerializer
+from notificacion.serializers import NotifySerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
 
-################
-## CRUD FLUJO ##
-################
+#######################
+## CRUD NOTIFICACION ##
+#######################
 
 ####################################################################################
 
-class FlujoCreateListApiView(generics.ListCreateAPIView):
+class NotifyCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los flujos que existen en la BD """
-    serializer_class = FlujoSerializer
-    queryset = FlujoSerializer.Meta.model.objects.all()
+    serializer_class = NotifySerializer
+    queryset = NotifySerializer.Meta.model.objects.all()
 
-    # Función para crear nuevos flujos
+    # Función para crear nuevas notificaciones
     def post(self, request):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Flujo creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
 
-class FlujoRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
+class NotifyRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
     """ Una vista que busca, actualiza y destruye los flujos que existen en la BD """
-    serializer_class = FlujoSerializer
+    serializer_class = NotifySerializer
 
-    # Consulta para traer todos los flujos que existen en la BD
+    # Consulta para traer todos las notificaciones que existen en la BD
     def get_queryset(self, pk=None):
         if pk is None:
             return self.get_serializer().Meta.model.objects.all()
         else:
             return self.get_serializer().Meta.model.objects.filter(id=pk).first()
 
-    # Obtiene un flujo en específico
+    # Obtiene una notificacion en específico
     def patch(self, request, pk=None):
         if self.get_queryset(pk):
             flujo_serializer = self.serializer_class(self.get_queryset(pk))
             return Response(flujo_serializer.data, status = status.HTTP_200_OK)
-        return Response({'error':'No existe ese flujo'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No existe esa notificación'}, status = status.HTTP_400_BAD_REQUEST)
     
-    # Actualiza un flujo en específico
+    # Actualiza una notificacion en específico
     def put(self, request, pk=None):
         if self.get_queryset(pk):
             flujo_serializer = self.serializer_class(self.get_queryset(pk), data = request.data) 
             if flujo_serializer.is_valid():
                 flujo_serializer.save()
-                return Response({'message':'flujo actualizado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No se puede actualizar ese flujo, no existe'}, status = status.HTTP_400_BAD_REQUEST)
+                return Response({'message':'Notificación actualizado correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No se puede actualizar esa notificación, no existe'}, status = status.HTTP_400_BAD_REQUEST)
  
-    # Elimina un flujo en específico
+    # Elimina una notificacion en específico
     def delete(self, request, pk=None):
         flujo_destroy = self.get_queryset().filter(id = pk).first()
 
         if flujo_destroy:
             flujo_destroy.delete()
-            return Response({'message':'flujo eliminado correctamente'}, status = status.HTTP_200_OK)
-        return Response({'error':'No se puede eliminar ese flujo, no existe'}, status = status.HTTP_400_BAD_REQUEST)
-        
-
-
+            return Response({'message':'Notificación eliminada correctamente'}, status = status.HTTP_200_OK)
+        return Response({'error':'No se puede eliminar esa notificación, no existe'}, status = status.HTTP_400_BAD_REQUEST)
