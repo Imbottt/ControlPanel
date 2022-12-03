@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from core.models import Alertas
+from core.models import Reporte
 
 
 ### SERIALIZADOR PARA LA ALERTA ###
-class AlertaSerializer(serializers.ModelSerializer):
+class ReporteSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto alerta """
     class Meta:
-        model = Alertas
-        fields = ('id','confirmacion','justificacion','tarea')
+        model = Reporte
+        fields = ('id','justificacion','tarea')
         read_only_Fields = ('id',)

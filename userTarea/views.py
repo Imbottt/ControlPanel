@@ -33,10 +33,7 @@ class UserTareaCreateListApiView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                'message':'Tarea asignada correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

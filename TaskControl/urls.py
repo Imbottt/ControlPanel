@@ -26,9 +26,11 @@ urlpatterns = [
     path('api/tarea/', include('tarea.urls')),
     path('api/subTarea/', include('subTarea.urls')),
     path('api/flujo/', include('flujo.urls')),
-    path('api/alerta/', include('alerta.urls')),
+    path('api/reporte/', include('reporte.urls')),
     path('api/userTarea/', include('userTarea.urls')),
     path('api/userFlujo/', include('userFlujo.urls')),
+    path('api/notificacion/', include('notificacion.urls')),
     path('api/registroEjecucion/', include('registroEjecucion.urls')),
     path('api/registroFlujo/', include('registroFlujo.urls')),
+    path('api/tareaRel/', include('tareaRelacionada.urls')),
 ]
