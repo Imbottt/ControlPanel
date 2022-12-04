@@ -58,7 +58,7 @@ class Unidad(models.Model):
     unidad_name = models.CharField(max_length=255,null=True, unique=True)
 
     # Claves foráneas
-    dir = models.ForeignKey(Direccion, on_delete=models.CASCADE) # SI SE BORRA LA DIRECCIÓN, LA UNIDAD TAMBIÉN DESAPARECERÁ
+    dir = models.ForeignKey(Direccion, null=True, on_delete=models.CASCADE) # SI SE BORRA LA DIRECCIÓN, LA UNIDAD TAMBIÉN DESAPARECERÁ
 
     def __str__(self):
         return self.unidad_name
@@ -223,9 +223,13 @@ class UserFlujo(models.Model):
 ### TABLA REPORTE ###
 class Reporte(models.Model):
     """ Tabla de Alertas """
+
+    id_reportador_rechazador = models.PositiveIntegerField()
     justificacion = models.CharField(max_length=255)
+    is_reported = models.BooleanField(default=False)
     # Claves foráneas
     tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
+    asignador_tarea = models.PositiveIntegerField()
 
     def __str__(self):
         return self.justificacion
@@ -294,5 +298,19 @@ class TareaRelacionada(models.Model):
     def __str__(self):
         return str(self.id_tarea_main)
 
+### TABLA USER - TAREA - TAREA SUBORDINADA ###
+class UserTSubTarea(models.Model):
+    """ Tabla para las tareas asociadas a usuarios y tareas subordinadas """
+
+    id_padre = models.PositiveIntegerField()
+    asignador = models.PositiveIntegerField()
+
+    # Clave foránea
+    userTarea = models.ForeignKey(UserTarea, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    tarea = models.ForeignKey(Tarea, null=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.id_padre)
 
 

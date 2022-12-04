@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
                 'write_only': True, 'min_length':5
                 }
             }
-
+ 
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['rol'] = RolSerializer(instance.rol).data

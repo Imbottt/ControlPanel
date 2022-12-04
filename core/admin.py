@@ -39,3 +39,4 @@ admin.site.register(models.Reporte) # Tabla Reporte
 admin.site.register(models.RegistroFlujo)# Tabla Registro Flujos
 admin.site.register(models.Notificacion)# Tabla Notificacion
 admin.site.register(models.TareaRelacionada)# Tabla Tarea Relacionada
+admin.site.register(models.UserTSubTarea) # Tabla UserTSubTarea
