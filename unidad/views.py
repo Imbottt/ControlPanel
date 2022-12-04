@@ -8,7 +8,8 @@ from unidad.serializers import UnidadSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 #################
 ## CRUD UNIDAD ##
@@ -20,14 +21,18 @@ class UnidadCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista las unidades que existen en la BD """
     serializer_class = UnidadSerializer
     queryset = UnidadSerializer.Meta.model.objects.all()
+
     # Función para crear nuevas unidades
     def post(self, request):
-        serializer = self.serializer_class(data = request.data)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        dir_serializer = self.serializer_class(data = request.data)
+        if dir_serializer.is_valid():
+            try:
+                dir_serializer.save()
+                return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa unidad ya existe')
+                return Response({'error':e}, status = status.HTTP_400_BAD_REQUEST)
+        return Response(dir_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
 

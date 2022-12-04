@@ -142,7 +142,7 @@ class UserCreateListApiView(generics.ListCreateAPIView):
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['creador', 'rol', 'unidad']
-
+ 
     # Función para crear nuevos usuarios
     def post(self, request):
         serializer = self.serializer_class(data = request.data)

@@ -12,10 +12,11 @@ from reporte.serializers import ReporteSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
+from django_filters.rest_framework import DjangoFilterBackend
 
-#################
-## CRUD ALERTA ##
-#################
+##################
+## CRUD REPORTE ##
+##################
 
 ####################################################################################
 
@@ -23,6 +24,8 @@ class ReporteCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los reportes que existen en la BD """
     serializer_class = ReporteSerializer
     queryset = ReporteSerializer.Meta.model.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id_reportador_rechazador','is_reported','asignador_tarea']
 
     # Función para crear nuevos reportes
     def post(self, request):

@@ -7,5 +7,5 @@ class ReporteSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto alerta """
     class Meta:
         model = Reporte
-        fields = ('id','justificacion','tarea')
+        fields = ('id','id_reportador_rechazador','justificacion','is_reported','tarea','asignador_tarea')
         read_only_Fields = ('id',)

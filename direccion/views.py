@@ -8,7 +8,8 @@ from direccion.serializers import DirSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 ####################
 ## CRUD DIRECCIÓN ##
@@ -16,7 +17,7 @@ from rest_framework import status, generics
 
 ####################################################################################
 
-class DirCreateListApiView(generics.ListCreateAPIView):
+class DirListCreateApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista las direcciones que existen en la BD """
     serializer_class = DirSerializer
     queryset = DirSerializer.Meta.model.objects.all()
@@ -24,10 +25,13 @@ class DirCreateListApiView(generics.ListCreateAPIView):
     # Función para crear nuevas direcciones
     def post(self, request):
         dir_serializer = self.serializer_class(data = request.data)
-
         if dir_serializer.is_valid():
-            dir_serializer.save()
-            return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+            try:
+                dir_serializer.save()
+                return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa dirección ya existe')
+                return Response({e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(dir_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################
@@ -65,8 +69,7 @@ class DirRetrieveUpdateDestroyApiView(generics.RetrieveUpdateDestroyAPIView):
         if dir_destroy:
             dir_destroy.delete()
             return Response({'message':'Dirección eliminado correctamente'}, status = status.HTTP_200_OK)
-        else:
-            return Response({'error':'No se puede eliminar la dirección, no existe'}, status = status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'No se puede eliminar la dirección, no existe'}, status = status.HTTP_400_BAD_REQUEST)
         
 
 
