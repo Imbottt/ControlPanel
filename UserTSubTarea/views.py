@@ -34,10 +34,7 @@ class UserTSubTareaCreateListApiView(generics.ListCreateAPIView):
         if serializer.is_valid():
             try:
                 serializer.save()
-                return Response(
-                    {'USER - TAREA - TAREASUB': serializer.data,
-                    'message':'USER - TAREA - TAREASUB creado correctamente'
-                    }, status = status.HTTP_201_CREATED)
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
             except IntegrityError as e:
                 e = ('Ese USER - TAREA - TAREASUB ya existe')
                 return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)

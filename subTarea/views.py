@@ -29,10 +29,7 @@ class SubTareaCreateListApiView(generics.ListCreateAPIView):
         if serializer.is_valid():
             try:
                 serializer.save()
-                return Response(
-                    {'Reporte': serializer.data,
-                    'message':'Tarea subordinada creada correctamente'
-                    }, status = status.HTTP_201_CREATED)
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
             except IntegrityError as e:
                 e = ('Esa tarea subordinada ya existe')
                 return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)

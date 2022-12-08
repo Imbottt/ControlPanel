@@ -107,6 +107,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 ### TABLA FLUJO ###
 class Flujo(models.Model):
     """ Tabla para los flujos """
+
+    flujo_choices = (
+        ("1", "Seleccionar"),
+        ("2", "Activar"),
+        ("3", "Desactivar")
+    )
+
     flujo_name = models.CharField(max_length=50, unique=True)
     descripcion_flujo = models.CharField(max_length=255)
     fecha_creacion = models.DateField(auto_now_add=True)
@@ -115,7 +122,7 @@ class Flujo(models.Model):
     fecha_fin = models.DateField()
     plazo_flujo = models.CharField(max_length=50)
     creador_flujo = models.PositiveIntegerField()
-    ejecutar = models.BooleanField(default=False)
+    ejecutar = models.CharField(max_length=10, choices=flujo_choices)
 
     # Fecha de ahora
     @property

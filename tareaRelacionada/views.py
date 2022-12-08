@@ -29,10 +29,7 @@ class TareaRelCreateListApiView(generics.ListCreateAPIView):
         if serializer.is_valid():
             try:
                 serializer.save()
-                return Response(
-                    {'Tarea relacionada': serializer.data,
-                    'message':'Tarea relacionada creada correctamente'
-                    }, status = status.HTTP_201_CREATED)
+                return Response(serializer.data, status = status.HTTP_201_CREATED)
             except IntegrityError as e:
                 e = ('Esa tarea relacionada ya existe')
                 return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)

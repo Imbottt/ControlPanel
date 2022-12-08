@@ -7,7 +7,7 @@ from core.models import UserFlujo
 from userFlujo.serializers import UserFlujoSerializer
 ### 
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status, generics, filters
 ###
 from django_filters.rest_framework import DjangoFilterBackend
 ### Capturar errores ###
@@ -23,7 +23,7 @@ class UserFlujoCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista los usuarios y flujos que existen en la BD """
     serializer_class = UserFlujoSerializer
     queryset = UserFlujoSerializer.Meta.model.objects.all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['user','flujo','asignador']
 
     # Función para asignar un flujo a un usuario
