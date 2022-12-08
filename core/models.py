@@ -109,9 +109,9 @@ class Flujo(models.Model):
     """ Tabla para los flujos """
 
     flujo_choices = (
-        ("1", "Seleccionar"),
-        ("2", "Activar"),
-        ("3", "Desactivar")
+        ("Seleccionar", "1"),
+        ("Ejecutando", "2"),
+        ("Sin ejecutar", "3")
     )
 
     flujo_name = models.CharField(max_length=50, unique=True)
