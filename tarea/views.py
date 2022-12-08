@@ -19,6 +19,12 @@ from django.db import IntegrityError
 
 class TareaCreateListApiView(generics.ListCreateAPIView):
     """ Una vista que crea y lista las tareas que existen en la BD """
+    ################################
+    # PERMISOS
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    ################################
     serializer_class = TareaSerializer
     queryset = TareaSerializer.Meta.model.objects.all()
 

@@ -36,12 +36,3 @@ class FlujoSerializer(serializers.ModelSerializer):
         fecha_ini = validated_data.pop('fecha_inicio')
         fecha_fin = validated_data.pop('fecha_fin')
         flujo = super().update(instance, validated_data)
-
-        if fecha_ini and fecha_fin:
-            flujo = Flujo.objects.get(fecha_ini = self.fecha_inicio)
-            flujo = Flujo.objects.get(fecha_fin = self.fecha_fin)
-            flujo.save()
-            flujo.append(Flujo.objects.create(**flujo))
-            instance.flujo.add(*flujo)
-            return instance
-    
