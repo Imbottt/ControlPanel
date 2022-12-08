@@ -1,18 +1,17 @@
 ###
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 ### Modelo de la BD ###
 from core.models import UserFlujo
-
 ### Serializadores ###
 from userFlujo.serializers import UserFlujoSerializer
-
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
 from django_filters.rest_framework import DjangoFilterBackend
+### Capturar errores ###
+from django.db import IntegrityError
 
 #####################
 ## CRUD USER-TAREA ##
@@ -32,11 +31,15 @@ class UserFlujoCreateListApiView(generics.ListCreateAPIView):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message':'Flujo asignado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            try:
+                serializer.save()
+                return Response(
+                    {'User-Flujo': serializer.data,
+                    'message':'Flujo asignado correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Ese flujo ya fue asignado')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

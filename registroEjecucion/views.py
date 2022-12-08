@@ -8,7 +8,8 @@ from registroEjecucion.serializers import RegistroExeSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 #############################
 ## CRUD REGISTRO EJECUCIÓN ##
@@ -21,16 +22,20 @@ class RegistroExeCreateListApiView(generics.ListCreateAPIView):
     serializer_class = RegistroExeSerializer
     queryset = RegistroExeSerializer.Meta.model.objects.all()
 
-    # Función para crear nuevos flujos
+    # Función para crear nuevos registros de ejecución
     def post(self, request):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message':'Registro de ejecución creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            try:
+                serializer.save()
+                return Response(
+                    {'Registro de ejecución de tareas': serializer.data,
+                    'message':'Registro de ejecución de tareas creado correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Ese registro de ejecución de tareas ya existe')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

@@ -8,7 +8,8 @@ from tareaRelacionada.serializers import TareaRelSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 ############################
 ## CRUD TAREA RELACIONADA ##
@@ -26,8 +27,15 @@ class TareaRelCreateListApiView(generics.ListCreateAPIView):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+                return Response(
+                    {'Tarea relacionada': serializer.data,
+                    'message':'Tarea relacionada creada correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa tarea relacionada ya existe')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

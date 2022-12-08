@@ -4,19 +4,18 @@ from core.models import Direccion
 
 class DirModelTest(TestCase):
 
-    # Crea una dirección correctamente
-    def test_create_dir_succesful(self):
-        dir_name = 'AgroSuper'
-        dir = Direccion.objects.create(
-            dir_name = dir_name
-        )
+    def setUp(self):
+        Direccion.objects.create(dir_name='AgroSuper')
+        Direccion.objects.create(dir_name='Process S.A.')
 
-        self.assertEqual(dir.dir_name, dir_name)
+    def test_existe_dir(self):
+        exists = Direccion.objects.filter(dir_name='AgroSuper').exists()
+        self.assertEqual(exists, True)
 
-    # Crear una dirección sin datos
-    def test_create_dir_empty_data(self):
-        dir = Direccion.objects.create(
-            dir_name = ""
-        )
+    def test_no_existe_dir(self):
+        not_exists = Direccion.objects.filter(dir_name='Paradise').exists()
+        self.assertEqual(not_exists, False)
 
-        self.assertIsNotNone(dir.dir_name) 
+    def test_empty_dir(self):
+        empty_dir = Direccion.objects.create(dir_name='')
+        self.assertIsNotNone(empty_dir, True)

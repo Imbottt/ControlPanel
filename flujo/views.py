@@ -8,7 +8,8 @@ from flujo.serializers import FlujoSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 ################
 ## CRUD FLUJO ##
@@ -26,11 +27,15 @@ class FlujoCreateListApiView(generics.ListCreateAPIView):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message':'Flujo creado correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            try:
+                serializer.save()
+                return Response(
+                    {'Flujo': serializer.data,
+                    'message':'Flujo creado correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa flujo ya existe')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

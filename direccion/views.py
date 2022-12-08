@@ -28,7 +28,11 @@ class DirListCreateApiView(generics.ListCreateAPIView):
         if dir_serializer.is_valid():
             try:
                 dir_serializer.save()
-                return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+                return Response(
+                    {'Dirección': dir_serializer.data,
+                    'message':'Dirección creada correctamente'
+                    }, 
+                    status = status.HTTP_201_CREATED)
             except IntegrityError as e:
                 e = ('Esa dirección ya existe')
                 return Response({e}, status = status.HTTP_400_BAD_REQUEST)

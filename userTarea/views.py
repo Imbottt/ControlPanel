@@ -1,18 +1,17 @@
 ###
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 ### Modelo de la BD ###
 from core.models import UserTarea
-
 ### Serializadores ###
 from userTarea.serializers import UserTareaSerializer
-
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
 ###
 from django_filters.rest_framework import DjangoFilterBackend
+### Capturar errores ###
+from django.db import IntegrityError
 
 #####################
 ## CRUD USER-TAREA ##
@@ -32,8 +31,15 @@ class UserTareaCreateListApiView(generics.ListCreateAPIView):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+                return Response(
+                    {'User-Tarea': serializer.data,
+                    'message':'Tarea asignada correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa tarea ya fue asignada')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

@@ -59,7 +59,7 @@ class Login(ObtainAuthToken):
             if user.is_active:
                 token, created = Token.objects.get_or_create(user = user)
                 user_serializer = UserTokenSerializer(user)
-                if created:
+                if created: 
                     return Response({
                         'token': token.key,
                         'user': user_serializer.data,

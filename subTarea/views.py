@@ -8,7 +8,8 @@ from subTarea.serializers import SubTareaSerializer
 ### 
 from rest_framework.response import Response
 from rest_framework import status, generics
-###
+### Capturar errores ###
+from django.db import IntegrityError
 
 ############################
 ## CRUD TAREA SUBORDINADA ##
@@ -26,11 +27,15 @@ class SubTareaCreateListApiView(generics.ListCreateAPIView):
         serializer = self.serializer_class(data = request.data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message':'Tarea subordinada creada correctamente'
-            }, status = status.HTTP_201_CREATED)
-
+            try:
+                serializer.save()
+                return Response(
+                    {'Reporte': serializer.data,
+                    'message':'Tarea subordinada creada correctamente'
+                    }, status = status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                e = ('Esa tarea subordinada ya existe')
+                return Response({'error': e}, status = status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 ####################################################################################

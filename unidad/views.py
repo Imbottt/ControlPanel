@@ -22,13 +22,16 @@ class UnidadCreateListApiView(generics.ListCreateAPIView):
     serializer_class = UnidadSerializer
     queryset = UnidadSerializer.Meta.model.objects.all()
 
-    # Función para crear nuevas unidades
+    # Función para crear nuevas unidades 
     def post(self, request):
         dir_serializer = self.serializer_class(data = request.data)
         if dir_serializer.is_valid():
             try:
                 dir_serializer.save()
-                return Response(dir_serializer.data, status = status.HTTP_201_CREATED)
+                return Response(
+                    {'Unidad': dir_serializer.data,
+                    'message':'Unidad creada correctamente'
+                    }, status = status.HTTP_201_CREATED)
             except IntegrityError as e:
                 e = ('Esa unidad ya existe')
                 return Response({'error':e}, status = status.HTTP_400_BAD_REQUEST)
