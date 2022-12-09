@@ -60,7 +60,7 @@ class FlujoSerializer(serializers.ModelSerializer):
     """ Serializador para el objeto Flujo """
     class Meta:
         model = Flujo
-        fields = ['id','flujo_name','descripcion_flujo','fecha_creacion','fecha_inicio','fecha_fin','plazo_flujo','progreso_f','creador_flujo','ejecutar']
+        fields = ['id','flujo_name','descripcion_flujo','fecha_creacion','fecha_inicio','fecha_fin','plazo_flujo','creador_flujo','ejecutar']
         read_only_Fields = ('id',)
 
 ### SERIALIZADOR PARA USER-TAREA###
